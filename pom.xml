@@ -1,0 +1,95 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <!--这是一个父工程-->
+  <packaging>pom</packaging>
+  <groupId>com.ershi</groupId>
+  <artifactId>HiChat</artifactId>
+  <version>1.0-SNAPSHOT</version>
+
+  <!--子模块-->
+  <modules>
+    <module>hichat-chat-server</module>
+    <module>hichat-tools</module>
+    <module>hichat-tools/hichat-common-starter</module>
+  </modules>
+
+  <!--springboot版本-->
+  <parent>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-parent</artifactId>
+    <version>2.6.7</version>
+    <relativePath/> <!-- lookup parent from repository -->
+  </parent>
+
+  <!--依赖版本号管理-->
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+    <java.version>1.8</java.version>
+    <skipTests>true</skipTests>
+    <hutool.version>5.8.18</hutool.version>
+    <springfox-swagger.version>3.0.0</springfox-swagger.version>
+    <swagger-models.version>1.6.0</swagger-models.version>
+    <mybatis-plus-generator.version>3.4.1</mybatis-plus-generator.version>
+    <mybatis.version>3.5.10</mybatis.version>
+    <mysql-connector.version>8.0.29</mysql-connector.version>
+    <spring-data-commons.version>2.7.5</spring-data-commons.version>
+    <lombok.version>1.18.10</lombok.version>
+    <mybatis-plus-boot-starter.version>3.4.0</mybatis-plus-boot-starter.version>
+    <redisson-spring-boot-starter.version>3.17.1</redisson-spring-boot-starter.version>
+  </properties>
+
+  <!--依赖管理-->
+  <dependencyManagement>
+    <dependencies>
+      <!--HiChat公共基础包-->
+      <dependency>
+        <groupId>com.ershi</groupId>
+        <artifactId>hichat-common-starter</artifactId>
+        <version>${version}</version>
+      </dependency>
+      <!--lombok-->
+      <dependency>
+        <groupId>org.projectlombok</groupId>
+        <artifactId>lombok</artifactId>
+        <version>${lombok.version}</version>
+      </dependency>
+      <!--hutool工具类-->
+      <dependency>
+        <groupId>cn.hutool</groupId>
+        <artifactId>hutool-all</artifactId>
+        <version>${hutool.version}</version>
+      </dependency>
+      <!--MyBatis-->
+      <dependency>
+        <groupId>org.mybatis</groupId>
+        <artifactId>mybatis</artifactId>
+        <version>${mybatis.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.baomidou</groupId>
+        <artifactId>mybatis-plus-boot-starter</artifactId>
+        <version>${mybatis-plus-boot-starter.version}</version>
+      </dependency>
+      <!--Mysql数据库驱动-->
+      <dependency>
+        <groupId>mysql</groupId>
+        <artifactId>mysql-connector-java</artifactId>
+        <version>${mysql-connector.version}</version>
+      </dependency>
+      <!--Redisson-->
+      <dependency>
+        <groupId>org.redisson</groupId>
+        <artifactId>redisson-spring-boot-starter</artifactId>
+        <version>${redisson-spring-boot-starter.version}</version>
+      </dependency>
+    </dependencies>
+
+  </dependencyManagement>
+
+  <build>
+    <finalName>HiChat</finalName>
+  </build>
+</project>
