@@ -39,6 +39,7 @@
     <lombok.version>1.18.10</lombok.version>
     <mybatis-plus-boot-starter.version>3.4.0</mybatis-plus-boot-starter.version>
     <redisson-spring-boot-starter.version>3.17.1</redisson-spring-boot-starter.version>
+    <netty-all.version>4.1.76.Final</netty-all.version>
   </properties>
 
   <!--依赖管理-->
@@ -84,6 +85,12 @@
         <groupId>org.redisson</groupId>
         <artifactId>redisson-spring-boot-starter</artifactId>
         <version>${redisson-spring-boot-starter.version}</version>
+      </dependency>
+      <!-- netty -->
+      <dependency>
+        <groupId>io.netty</groupId>
+        <artifactId>netty-all</artifactId>
+        <version>${netty-all.version}</version>
       </dependency>
     </dependencies>
 
