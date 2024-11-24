@@ -40,6 +40,7 @@
     <mybatis-plus-boot-starter.version>3.4.0</mybatis-plus-boot-starter.version>
     <redisson-spring-boot-starter.version>3.17.1</redisson-spring-boot-starter.version>
     <netty-all.version>4.1.76.Final</netty-all.version>
+    <knife4j.version>2.0.9</knife4j.version>
   </properties>
 
   <!--依赖管理-->
@@ -91,6 +92,12 @@
         <groupId>io.netty</groupId>
         <artifactId>netty-all</artifactId>
         <version>${netty-all.version}</version>
+      </dependency>
+      <!--knife4j-->
+      <dependency>
+        <groupId>com.github.xiaoymin</groupId>
+        <artifactId>knife4j-spring-boot-starter</artifactId>
+        <version>${knife4j.version}</version>
       </dependency>
     </dependencies>
 
