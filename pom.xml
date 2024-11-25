@@ -33,6 +33,7 @@
     <springfox-swagger.version>3.0.0</springfox-swagger.version>
     <swagger-models.version>1.6.0</swagger-models.version>
     <mybatis-plus-generator.version>3.4.1</mybatis-plus-generator.version>
+    <velocity-engine-core.version>2.0</velocity-engine-core.version>
     <mybatis.version>3.5.10</mybatis.version>
     <mysql-connector.version>8.0.29</mysql-connector.version>
     <spring-data-commons.version>2.7.5</spring-data-commons.version>
@@ -74,6 +75,23 @@
         <groupId>com.baomidou</groupId>
         <artifactId>mybatis-plus-boot-starter</artifactId>
         <version>${mybatis-plus-boot-starter.version}</version>
+      </dependency>
+      <!--Mybatis代码生成器-->
+      <dependency>
+        <groupId>com.baomidou</groupId>
+        <artifactId>mybatis-plus-generator</artifactId>
+        <version>${mybatis-plus-generator.version}</version>
+        <exclusions>
+          <exclusion>
+            <artifactId>mybatis-plus-extension</artifactId>
+            <groupId>com.baomidou</groupId>
+          </exclusion>
+        </exclusions>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.velocity</groupId>
+        <artifactId>velocity-engine-core</artifactId>
+        <version>${velocity-engine-core.version}</version>
       </dependency>
       <!--Mysql数据库驱动-->
       <dependency>
