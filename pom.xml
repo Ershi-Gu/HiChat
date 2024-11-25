@@ -42,6 +42,9 @@
     <redisson-spring-boot-starter.version>3.17.1</redisson-spring-boot-starter.version>
     <netty-all.version>4.1.76.Final</netty-all.version>
     <knife4j.version>2.0.9</knife4j.version>
+    <spring-boot-test.version>2.6.7</spring-boot-test.version>
+    <junit.version>4.13.2</junit.version>
+    <spring-test.version>5.3.19</spring-test.version>
   </properties>
 
   <!--依赖管理-->
@@ -116,6 +119,24 @@
         <groupId>com.github.xiaoymin</groupId>
         <artifactId>knife4j-spring-boot-starter</artifactId>
         <version>${knife4j.version}</version>
+      </dependency>
+      <!--springboot-test-->
+      <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-test</artifactId>
+        <version>${spring-boot-test.version}</version>
+      </dependency>
+      <!--junit-->
+      <dependency>
+        <groupId>junit</groupId>
+        <artifactId>junit</artifactId>
+        <version>${junit.version}</version>
+      </dependency>
+      <!--spring-test-->
+      <dependency>
+        <groupId>org.springframework</groupId>
+        <artifactId>spring-test</artifactId>
+        <version>${spring-test.version}</version>
       </dependency>
     </dependencies>
 
