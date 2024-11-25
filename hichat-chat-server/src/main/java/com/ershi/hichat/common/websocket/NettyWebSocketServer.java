@@ -91,10 +91,12 @@ public class NettyWebSocketServer {
                     @Override
                     protected void initChannel(SocketChannel channel) throws Exception {
                         ChannelPipeline pipeline = channel.pipeline();
-                        //30秒客户端没有向服务器发送心跳则关闭连接
-                        //IdleStateHandler能够侦测连接空闲状态
-                        //第一个参数表示连接多少秒没有读操作时触发事件，第二个是写操作，第三个是读写操作都算，0表示禁用
-//                        pipeline.addLast(new IdleStateHandler(30, 0, 0));
+                        /**
+                         * 1. 30秒客户端没有向服务器发送心跳则关闭连接
+                         * 2. IdleStateHandler能够侦测连接空闲状态
+                         * 3. 第一个参数表示客户端多少秒没有读操作时触发事件，第二个是写操作(服务端是否推送)，第三个是读写操作都算，0表示禁用
+                         */
+                        pipeline.addLast(new IdleStateHandler(30, 0, 0));
                         // 因为使用http协议，所以需要使用http的复合编码器解码器
                         pipeline.addLast(new HttpServerCodec());
                         // 数据采用逐块发送到通道，可以处理大文件
