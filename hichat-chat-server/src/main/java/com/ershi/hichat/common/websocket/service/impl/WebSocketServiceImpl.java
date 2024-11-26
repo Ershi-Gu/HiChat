@@ -80,6 +80,12 @@ public class WebSocketServiceImpl implements WebSocketService {
         sendMsg(channel, WebSocketAdapter.buildResp(wxMpQrCodeTicket));
     }
 
+    @Override
+    public void remove(Channel channel) {
+        ONLINE_WS_MAP.remove(channel);
+        // todo 用户下线
+    }
+
     /**
      * 主动推送消息
      * @param channel

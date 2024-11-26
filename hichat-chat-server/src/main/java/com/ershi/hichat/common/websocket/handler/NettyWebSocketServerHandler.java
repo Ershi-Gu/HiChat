@@ -5,6 +5,7 @@ import cn.hutool.json.JSONUtil;
 import com.ershi.hichat.common.user.domain.enums.WSReqTypeEnum;
 import com.ershi.hichat.common.user.domain.vo.request.ws.WSBaseReq;
 import com.ershi.hichat.common.websocket.service.WebSocketService;
+import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
@@ -30,7 +31,7 @@ public class NettyWebSocketServerHandler extends SimpleChannelInboundHandler<Tex
     private WebSocketService webSocketService;
 
     /**
-     * 当一个ws连接进来时，对它进行临时保存
+     * 当一个用户通过ws连接进来时，对连接进行临时保存
      * @param ctx
      * @throws Exception
      */
@@ -38,6 +39,16 @@ public class NettyWebSocketServerHandler extends SimpleChannelInboundHandler<Tex
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
         webSocketService = SpringUtil.getBean(WebSocketService.class);
         webSocketService.connect(ctx.channel());
+    }
+
+    /**
+     * 用户关闭连接，下线相关数据
+     * @param ctx
+     * @throws Exception
+     */
+    @Override
+    public void channelInactive(ChannelHandlerContext ctx) throws Exception {
+        userOffline(ctx.channel());
     }
 
     /**
@@ -58,10 +69,20 @@ public class NettyWebSocketServerHandler extends SimpleChannelInboundHandler<Tex
             if (state == IdleState.READER_IDLE) {
                 System.out.println("读空闲");
                 // todo 用户下线
+                userOffline(ctx.channel());
                 // 关闭连接
                 ctx.channel().close();
             }
         }
+    }
+
+    /**
+     * 用户下线操作
+     * @param channel
+     */
+    private void userOffline(Channel channel) {
+        webSocketService.remove(channel);
+        channel.close();
     }
 
     /**
