@@ -98,7 +98,7 @@ public class WebSocketServiceImpl implements WebSocketService {
         Integer code;
         do {
             code = RandomUtil.randomInt(Integer.MAX_VALUE);
-        } while (Objects.isNull(WAIT_LOGIN_MAP.asMap().putIfAbsent(code, channel)));
+        } while (Objects.nonNull(WAIT_LOGIN_MAP.asMap().putIfAbsent(code, channel)));
         return code;
     }
 }
