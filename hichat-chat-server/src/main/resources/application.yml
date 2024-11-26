@@ -3,7 +3,7 @@ server:
 spring:
   profiles:
     # 运行的环境
-    active: my-test
+    active: local
   application:
     # 项目名
     name: hichat
@@ -22,7 +22,7 @@ spring:
     # 连接超时时间
     timeout: 1800000
     # 设置密码
-    password: ${hichat.redis.password}
+  #    password: ${hichat.redis.password}
   jackson:
     serialization:
       write-dates-as-timestamps: true
@@ -33,3 +33,18 @@ mybatis-plus:
     log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
     # 下划线转换驼峰
     map-underscore-to-camel-case: true
+# 微信公众号
+wx:
+  mp:
+    useRedis: false
+    redisConfig:
+      host: 127.0.0.1
+      port: 6379
+      timeout: 2000
+    #    callback: http://f4cd-113-92-129-127.ngrok.io
+    callback: ${hichat.wx.callback}
+    configs:
+      - appId: ${hichat.wx.appId} # 第一个公众号的appid
+        secret: ${hichat.wx.secret} # 公众号的appsecret
+        token: ${hichat.wx.token} # 接口配置里的Token值
+        aesKey: ${hichat.wx.aesKey} # 接口配置里的EncodingAESKey值
