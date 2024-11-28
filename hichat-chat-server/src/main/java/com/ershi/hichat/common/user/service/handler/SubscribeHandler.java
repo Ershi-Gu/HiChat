@@ -1,12 +1,16 @@
 package com.ershi.hichat.common.user.service.handler;
 
+import com.ershi.hichat.common.user.service.WXMsgService;
+import com.ershi.hichat.common.user.service.adapter.TextBuilder;
 import me.chanjar.weixin.common.error.WxErrorException;
 import me.chanjar.weixin.common.session.WxSessionManager;
 import me.chanjar.weixin.mp.api.WxMpService;
 import me.chanjar.weixin.mp.bean.message.WxMpXmlMessage;
 import me.chanjar.weixin.mp.bean.message.WxMpXmlOutMessage;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.Resource;
 import java.util.Map;
 
 /**
@@ -15,8 +19,10 @@ import java.util.Map;
  */
 @Component
 public class SubscribeHandler extends AbstractHandler {
-//    @Autowired
-//    private WxMsgService wxMsgService;
+
+    @Resource
+    @Lazy
+    private WXMsgService wxMsgService;
 
     @Override
     public WxMpXmlOutMessage handle(WxMpXmlMessage wxMessage,
@@ -29,23 +35,16 @@ public class SubscribeHandler extends AbstractHandler {
 
         WxMpXmlOutMessage responseResult = null;
         try {
-            responseResult = this.handleSpecial(weixinService, wxMessage);
+            // 判断是否是扫码关注的用户 => 看能否能从带参二维码中拿到登录码，如有则是通过扫码关注的用户
+            responseResult = wxMsgService.scan(wxMessage);
         } catch (Exception e) {
             this.logger.error(e.getMessage(), e);
         }
-
+        // 该属性为null说明不是通过扫码关注用户，而是普通用户
         if (responseResult != null) {
             return responseResult;
         }
-
-        try {
-//            return new TextBuilder().build("感谢关注", wxMessage, weixinService);
-            return null;
-        } catch (Exception e) {
-            this.logger.error(e.getMessage(), e);
-        }
-
-        return null;
+        return TextBuilder.build("感谢关注！", wxMessage);
     }
 
     /**
@@ -53,7 +52,6 @@ public class SubscribeHandler extends AbstractHandler {
      */
     private WxMpXmlOutMessage handleSpecial(WxMpService weixinService, WxMpXmlMessage wxMessage)
             throws Exception {
-//        return wxMsgService.scan(weixinService, wxMessage);
         return null;
     }
 

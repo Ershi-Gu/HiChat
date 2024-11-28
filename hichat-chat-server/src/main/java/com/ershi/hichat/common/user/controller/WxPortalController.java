@@ -1,21 +1,18 @@
 package com.ershi.hichat.common.user.controller;
 
+import com.ershi.hichat.common.user.service.WXMsgService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import me.chanjar.weixin.common.bean.WxOAuth2UserInfo;
 import me.chanjar.weixin.common.bean.oauth2.WxOAuth2AccessToken;
 import me.chanjar.weixin.common.error.WxErrorException;
-import me.chanjar.weixin.common.service.WxService;
 import me.chanjar.weixin.mp.api.WxMpMessageRouter;
 import me.chanjar.weixin.mp.api.WxMpService;
 import me.chanjar.weixin.mp.bean.message.WxMpXmlMessage;
 import me.chanjar.weixin.mp.bean.message.WxMpXmlOutMessage;
-import me.chanjar.weixin.mp.bean.result.WxMpQrCodeTicket;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.view.RedirectView;
-
-import javax.annotation.Resource;
 
 /**
  * Description: 微信api交互接口
@@ -30,27 +27,11 @@ public class WxPortalController {
 
     private final WxMpService wxService;
     private final WxMpMessageRouter messageRouter;
-//    private final WxMsgService wxMsgService;
+    private final WXMsgService wxMsgService;
 
 
     /**
-     * 二维码生成测试接口，生产环境请删除
-     */
-    @Resource
-    private WxMpService wxMpService;
-
-    @GetMapping("/test")
-    public String getQrCode(@RequestParam Integer code) throws WxErrorException {
-        WxMpQrCodeTicket wxMpQrCodeTicket =
-                wxMpService.getQrcodeService().qrCodeCreateTmpTicket(code, 10000);
-        String url = wxMpQrCodeTicket.getUrl();
-        System.out.println(url);
-        return url;
-    }
-
-
-    /**
-     * 接收微信服务器请求方法
+     * 接收微信服务器认证请求
      *
      * @param signature
      * @param timestamp
@@ -78,16 +59,23 @@ public class WxPortalController {
         return "非法请求";
     }
 
+    /**
+     * 用户微信平台授权回调方法
+     * @param code
+     * @return {@link RedirectView}
+     */
     @GetMapping("/callBack")
     public RedirectView callBack(@RequestParam String code) {
-        System.out.println("callback==========");
         try {
-            WxOAuth2AccessToken accessToken = wxMpService.getOAuth2Service().getAccessToken(code);
-            WxOAuth2UserInfo userInfo = wxMpService.getOAuth2Service().getUserInfo(accessToken, "zh_CN");
-            System.out.println(userInfo);
+            WxOAuth2AccessToken accessToken = wxService.getOAuth2Service().getAccessToken(code);
+            WxOAuth2UserInfo userInfo = wxService.getOAuth2Service().getUserInfo(accessToken, "zh_CN");
+            wxMsgService.authorize(userInfo);
         } catch (WxErrorException e) {
             log.error("wx callback error", e);
         }
+        RedirectView redirectView = new RedirectView();
+        // todo 点击授权后用户重定向页面制作
+        redirectView.setUrl("www.guershi.cn");
         return null;
     }
 

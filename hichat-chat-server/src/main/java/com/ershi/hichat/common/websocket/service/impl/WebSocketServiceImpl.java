@@ -2,7 +2,10 @@ package com.ershi.hichat.common.websocket.service.impl;
 
 import cn.hutool.core.util.RandomUtil;
 import cn.hutool.json.JSONUtil;
+import com.ershi.hichat.common.user.dao.UserDao;
+import com.ershi.hichat.common.user.domain.entity.User;
 import com.ershi.hichat.common.user.domain.vo.response.ws.WSBaseResp;
+import com.ershi.hichat.common.user.service.LoginService;
 import com.ershi.hichat.common.websocket.domain.dto.WSChannelExtraDTO;
 import com.ershi.hichat.common.websocket.service.WebSocketService;
 import com.ershi.hichat.common.websocket.service.adapter.WebSocketAdapter;
@@ -10,9 +13,11 @@ import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import io.netty.channel.Channel;
 import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
+import io.swagger.models.auth.In;
 import lombok.SneakyThrows;
 import me.chanjar.weixin.mp.api.WxMpService;
 import me.chanjar.weixin.mp.bean.result.WxMpQrCodeTicket;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -29,8 +34,21 @@ import java.util.concurrent.ConcurrentHashMap;
 @Service
 public class WebSocketServiceImpl implements WebSocketService {
 
+    /**
+     * 微信业务处理器
+     */
     @Resource
+    @Lazy // 解决 wxMpConfiguration -> scanHandler -> WXMsgServiceImpl -> webSocketServiceImpl 循环依赖
     private WxMpService wxMpService;
+
+    @Resource
+    private UserDao userDao;
+
+    /**
+     * 登录业务处理
+     */
+    @Resource
+    private LoginService loginService;
 
     /**
      * 管理所有在线用户的连接（登录态/游客）
@@ -80,6 +98,11 @@ public class WebSocketServiceImpl implements WebSocketService {
         sendMsg(channel, WebSocketAdapter.buildResp(wxMpQrCodeTicket));
     }
 
+    /**
+     * 移除保存的用户登录连接
+     *
+     * @param channel
+     */
     @Override
     public void remove(Channel channel) {
         ONLINE_WS_MAP.remove(channel);
@@ -87,7 +110,44 @@ public class WebSocketServiceImpl implements WebSocketService {
     }
 
     /**
+     * 扫码登录成功，推送前端登录成功信息
+     *
+     * @param code
+     * @param uid
+     */
+    @Override
+    public void scanLoginSuccess(Integer code, Long uid) {
+        // 通过code获取需要登录的连接
+        Channel channel = WAIT_LOGIN_MAP.getIfPresent(code);
+        if (Objects.isNull(channel)) { // 如果找不到连接直接返回，静默处理
+            return;
+        }
+        User user = userDao.getById(uid);
+        // 移除code和channel的映射
+        WAIT_LOGIN_MAP.invalidate(code);
+        // 调用登录模块获取token
+        String token = loginService.login(uid);
+        // 用户登录
+        sendMsg(channel, WebSocketAdapter.buildResp(user, token));
+
+    }
+
+    /**
+     * 推送前端等待授权消息
+     * @param code
+     */
+    @Override
+    public void waitAuthorize(Integer code) {
+        Channel channel = WAIT_LOGIN_MAP.getIfPresent(code);
+        if(Objects.isNull(channel)){
+            return;
+        }
+        sendMsg(channel,WebSocketAdapter.buildWaitAuthorizeResp());
+    }
+
+    /**
      * 主动推送消息
+     *
      * @param channel
      * @param msg
      */
@@ -97,6 +157,7 @@ public class WebSocketServiceImpl implements WebSocketService {
 
     /**
      * 生成临时登录码
+     *
      * @param channel
      * @return {@link Integer}
      */
