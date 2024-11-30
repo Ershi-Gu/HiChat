@@ -77,7 +77,7 @@ public class LoginServiceImpl implements LoginService {
             return null;
         }
         // 验证token是否过期
-        String tokenByRedis = RedisUtils.get(getUserTokenKey(uid), String.class);
+        String tokenByRedis = RedisUtils.getStr(getUserTokenKey(uid));
         if (StringUtils.isBlank(tokenByRedis)) {
             return null;
         }
