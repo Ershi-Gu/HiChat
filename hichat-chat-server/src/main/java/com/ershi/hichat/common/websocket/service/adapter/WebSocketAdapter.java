@@ -28,7 +28,13 @@ public class WebSocketAdapter {
         return qrCodeUrl;
     }
 
-    public static WSBaseResp<?> buildResp(User user, String token) {
+    /**
+     * 构建token返回
+     * @param user
+     * @param token
+     * @return {@link WSBaseResp}<{@link ?}>
+     */
+    public static WSBaseResp<?> buildTokenResp(User user, String token) {
         WSBaseResp<WSLoginSuccess> wsLoginSuccessResp = new WSBaseResp<>();
         wsLoginSuccessResp.setType(WSRespTypeEnum.LOGIN_SUCCESS.getType());
         WSLoginSuccess build = WSLoginSuccess.builder()
@@ -41,9 +47,23 @@ public class WebSocketAdapter {
         return wsLoginSuccessResp;
     }
 
+    /**
+     * 构建等待授权通知返回
+     * @return {@link WSBaseResp}<{@link ?}>
+     */
     public static WSBaseResp<?> buildWaitAuthorizeResp() {
         WSBaseResp<Object> wsWaitAuthorizeResp = new WSBaseResp<>();
         wsWaitAuthorizeResp.setType(WSRespTypeEnum.LOGIN_SCAN_SUCCESS.getType());
+        return wsWaitAuthorizeResp;
+    }
+
+    /**
+     * 构建token失效返回
+     * @return {@link WSBaseResp}<{@link ?}>
+     */
+    public static WSBaseResp<?> buildInvalidTokenResp() {
+        WSBaseResp<Object> wsWaitAuthorizeResp = new WSBaseResp<>();
+        wsWaitAuthorizeResp.setType(WSRespTypeEnum.INVALIDATE_TOKEN.getType());
         return wsWaitAuthorizeResp;
     }
 }

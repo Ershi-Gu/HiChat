@@ -128,22 +128,57 @@ public class WebSocketServiceImpl implements WebSocketService {
         WAIT_LOGIN_MAP.invalidate(code);
         // 调用登录模块获取token
         String token = loginService.login(uid);
-        // 用户登录
-        sendMsg(channel, WebSocketAdapter.buildResp(user, token));
+        // 推送用户登录成功通知
+        loginSuccess(channel, user, token);
+    }
 
+    /**
+     * 通用推送前端登录成功信息
+     * @param channel
+     * @param user
+     * @param token
+     */
+    private void loginSuccess(Channel channel, User user, String token) {
+        // 保存channel-uid映射
+        WSChannelExtraDTO wsChannelExtraDTO = ONLINE_WS_MAP.get(channel);
+        wsChannelExtraDTO.setUid(user.getId());
+        // todo 推送用户上线成功事件
+        // 推送前端登录成功消息
+        sendMsg(channel, WebSocketAdapter.buildTokenResp(user, token));
     }
 
     /**
      * 推送前端等待授权消息
+     *
      * @param code
      */
     @Override
     public void waitAuthorize(Integer code) {
         Channel channel = WAIT_LOGIN_MAP.getIfPresent(code);
-        if(Objects.isNull(channel)){
+        if (Objects.isNull(channel)) {
             return;
         }
-        sendMsg(channel,WebSocketAdapter.buildWaitAuthorizeResp());
+        sendMsg(channel, WebSocketAdapter.buildWaitAuthorizeResp());
+    }
+
+    /**
+     * 携带token的登录鉴权
+     *
+     * @param channel
+     * @param token
+     */
+    @Override
+    public void authorize(Channel channel, String token) {
+        // 判断token是否有效
+        Long validUid = loginService.getValidUid(token);
+        if (Objects.nonNull(validUid)) {
+            // token有效，通知登录成功，携带用户信息
+            User user = userDao.getById(validUid);
+            loginSuccess(channel, user, token);
+        } else {
+            // 通知前端token失效，请删除
+            sendMsg(channel, WebSocketAdapter.buildInvalidTokenResp());
+        }
     }
 
     /**
