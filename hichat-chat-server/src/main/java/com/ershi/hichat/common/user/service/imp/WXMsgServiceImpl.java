@@ -16,6 +16,7 @@ import me.chanjar.weixin.common.bean.WxOAuth2UserInfo;
 import me.chanjar.weixin.mp.api.WxMpService;
 import me.chanjar.weixin.mp.bean.message.WxMpXmlMessage;
 import me.chanjar.weixin.mp.bean.message.WxMpXmlOutMessage;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
@@ -71,16 +72,16 @@ public class WXMsgServiceImpl implements WXMsgService {
     /**
      * ws 连接业务
      */
-    @Resource
+    @Autowired
     private WebSocketService webSocketService;
 
-    @Resource
+    @Autowired
     private UserDao userDao;
 
-    @Resource
+    @Autowired
     private UserService userService;
 
-    @Resource
+    @Autowired
     @Lazy // 解决 WxMapConfiguration -> SubscribeHandler -> WXMsgServiceImpl -> 循环依赖
     private WxMpService wxMpService;
 

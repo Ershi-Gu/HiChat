@@ -17,6 +17,7 @@ import io.swagger.models.auth.In;
 import lombok.SneakyThrows;
 import me.chanjar.weixin.mp.api.WxMpService;
 import me.chanjar.weixin.mp.bean.result.WxMpQrCodeTicket;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
@@ -37,17 +38,17 @@ public class WebSocketServiceImpl implements WebSocketService {
     /**
      * 微信业务处理器
      */
-    @Resource
+    @Autowired
     @Lazy // 解决 wxMpConfiguration -> scanHandler -> WXMsgServiceImpl -> webSocketServiceImpl 循环依赖
     private WxMpService wxMpService;
 
-    @Resource
+    @Autowired
     private UserDao userDao;
 
     /**
      * 登录业务处理
      */
-    @Resource
+    @Autowired
     private LoginService loginService;
 
     /**

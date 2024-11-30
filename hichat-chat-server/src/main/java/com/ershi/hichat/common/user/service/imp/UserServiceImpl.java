@@ -3,6 +3,7 @@ package com.ershi.hichat.common.user.service.imp;
 import com.ershi.hichat.common.user.dao.UserDao;
 import com.ershi.hichat.common.user.domain.entity.User;
 import com.ershi.hichat.common.user.service.UserService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -11,7 +12,7 @@ import javax.annotation.Resource;
 
 @Service
 public class UserServiceImpl implements UserService {
-    @Resource
+    @Autowired
     private UserDao userDao;
 
     @Override
