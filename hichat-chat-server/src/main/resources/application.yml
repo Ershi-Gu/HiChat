@@ -22,7 +22,7 @@ spring:
     # 连接超时时间
     timeout: 1800000
     # 设置密码
-  #    password: ${hichat.redis.password}
+    password: ${hichat.redis.password}
   jackson:
     serialization:
       write-dates-as-timestamps: true
@@ -48,3 +48,6 @@ wx:
         secret: ${hichat.wx.secret} # 公众号的appsecret
         token: ${hichat.wx.token} # 接口配置里的Token值
         aesKey: ${hichat.wx.aesKey} # 接口配置里的EncodingAESKey值
+# jwt密钥
+jwt:
+  secret: ${hichat.jwt.secret}
