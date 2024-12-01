@@ -22,6 +22,7 @@ import java.util.concurrent.TimeUnit;
 public class LoginServiceImpl implements LoginService {
 
     public static final int REMAINING_EXPIRE_TIME_SECONDS = 86400;
+
     @Autowired
     private JwtUtils jwtUtils;
 
