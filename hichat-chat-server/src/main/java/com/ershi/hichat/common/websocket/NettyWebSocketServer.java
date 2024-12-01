@@ -1,5 +1,6 @@
 package com.ershi.hichat.common.websocket;
 
+import com.ershi.hichat.common.websocket.handler.HttpHeaderHandler;
 import com.ershi.hichat.common.websocket.handler.NettyWebSocketServerHandler;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelInitializer;
@@ -7,14 +8,10 @@ import io.netty.channel.ChannelOption;
 import io.netty.channel.ChannelPipeline;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
-import io.netty.channel.socket.ServerSocketChannel;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.handler.codec.http.HttpObjectAggregator;
 import io.netty.handler.codec.http.HttpServerCodec;
-import io.netty.handler.codec.http.websocketx.WebSocketFrame;
-import io.netty.handler.codec.http.websocketx.WebSocketHandshakeException;
-import io.netty.handler.codec.http.websocketx.WebSocketServerHandshaker;
 import io.netty.handler.codec.http.websocketx.WebSocketServerProtocolHandler;
 import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
@@ -106,6 +103,11 @@ public class NettyWebSocketServer {
                          *  1. Netty 中http数据在传输过程中是分段的，请求头和请求体会分开接受，HttpObjectAggregator可以把多个段聚合起来；
                          */
                         pipeline.addLast(new HttpObjectAggregator(8192));
+                        /**
+                         * 说明：
+                         * 1. http请求头处理器，获取token进行握手认证
+                         */
+                        pipeline.addLast(new HttpHeaderHandler());
                         /**
                          * 说明：
                          *  1. 该处理器用于升级 HTTP 协议到 WebSocket

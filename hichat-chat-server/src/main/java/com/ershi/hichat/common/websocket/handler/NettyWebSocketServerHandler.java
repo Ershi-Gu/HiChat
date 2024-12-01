@@ -5,6 +5,7 @@ import cn.hutool.json.JSONUtil;
 import com.ershi.hichat.common.user.domain.enums.WSReqTypeEnum;
 import com.ershi.hichat.common.user.domain.vo.request.ws.WSBaseReq;
 import com.ershi.hichat.common.websocket.service.WebSocketService;
+import com.ershi.hichat.common.websocket.utils.NettyUtil;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
@@ -14,6 +15,7 @@ import io.netty.handler.codec.http.websocketx.WebSocketServerProtocolHandler;
 import io.netty.handler.timeout.IdleState;
 import io.netty.handler.timeout.IdleStateEvent;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.logging.log4j.util.Strings;
 
 
 /**
@@ -43,6 +45,7 @@ public class NettyWebSocketServerHandler extends SimpleChannelInboundHandler<Tex
 
     /**
      * 用户关闭连接，下线相关数据
+     *
      * @param ctx
      * @throws Exception
      */
@@ -52,28 +55,32 @@ public class NettyWebSocketServerHandler extends SimpleChannelInboundHandler<Tex
     }
 
     /**
-     * 用户线程发出事件后触发该方法
+     * 处理用户事件，用户线程发出事件后触发该方法
      * @param ctx channel上下文
      * @param evt 事件
      * @throws Exception
      */
     @Override
     public void userEventTriggered(ChannelHandlerContext ctx, Object evt) throws Exception {
-        if (evt instanceof WebSocketServerProtocolHandler.HandshakeComplete) {
-            System.out.println("握手完成");
-        } else if (evt instanceof IdleStateEvent) {
+        // 心跳检查
+        if (evt instanceof IdleStateEvent) {
             IdleStateEvent event = (IdleStateEvent) evt;
+            // 获取心跳检查状态
             IdleState state = event.state();
-            // 读空闲（客户端规定时间内未请求读取消息）
-            // todo 心跳处理
             if (state == IdleState.READER_IDLE) {
-                System.out.println("读空闲");
-                // todo 用户下线
+                // 用户下线，同时关闭连接
                 userOffline(ctx.channel());
-                // 关闭连接
-                ctx.channel().close();
             }
         }
+        // 握手认证
+        else if (evt instanceof WebSocketServerProtocolHandler.HandshakeComplete) {
+            // 从channel中获取保存的token数据
+            String token = NettyUtil.get(ctx.channel(), NettyUtil.TOKEN);
+            if (Strings.isNotBlank(token)) {
+                webSocketService.authorize(ctx.channel(), token);
+            }
+        }
+
     }
 
     /**
@@ -93,10 +100,9 @@ public class NettyWebSocketServerHandler extends SimpleChannelInboundHandler<Tex
      */
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, TextWebSocketFrame msg) throws Exception {
-        // 获取消息内容
         String text = msg.text();
-        // 转换成包装类
         WSBaseReq wsBaseReq = JSONUtil.toBean(text, WSBaseReq.class);
+        // 根据不同类型的消息请求做不同的处理
         switch (WSReqTypeEnum.of(wsBaseReq.getType())) {
             case LOGIN:
                 webSocketService.handlerLoginReq(ctx.channel());
@@ -104,6 +110,7 @@ public class NettyWebSocketServerHandler extends SimpleChannelInboundHandler<Tex
             case HEARTBEAT:
                 break;
             case AUTHORIZE:
+                webSocketService.authorize(ctx.channel(), wsBaseReq.getData());
                 break;
         }
     }
