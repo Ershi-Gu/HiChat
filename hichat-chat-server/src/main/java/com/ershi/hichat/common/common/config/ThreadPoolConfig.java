@@ -27,6 +27,15 @@ public class ThreadPoolConfig implements AsyncConfigurer{
     public static final String HICHAT_EXECUTOR = "hichatExecutor";
 
     /**
+     * 指定@Async使用的线程池
+     * @return {@link Executor}
+     */
+    @Override
+    public Executor getAsyncExecutor() {
+        return hichatExecutor();
+    }
+
+    /**
      * 自定义项目通用线程池
      * @return {@link ThreadPoolTaskExecutor}
      */
