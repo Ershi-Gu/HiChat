@@ -47,7 +47,7 @@ public class LoginServiceImpl implements LoginService {
     }
 
     /**
-     * 刷新token有消息
+     * 异步刷新token有效期
      * @param token
      */
     @Override
