@@ -1,6 +1,7 @@
 package com.ershi.hichat.common.user.controller;
 
 import com.ershi.hichat.common.user.service.WXMsgService;
+import io.swagger.annotations.Api;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import me.chanjar.weixin.common.bean.WxOAuth2UserInfo;
@@ -23,6 +24,7 @@ import org.springframework.web.servlet.view.RedirectView;
 @AllArgsConstructor
 @RestController
 @RequestMapping("wx/portal/public")
+@Api(tags = "微信公众号平台相关接口")
 public class WxPortalController {
 
     private final WxMpService wxService;

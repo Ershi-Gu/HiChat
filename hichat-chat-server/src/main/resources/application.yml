@@ -7,6 +7,9 @@ spring:
   application:
     # 项目名
     name: hichat
+  mvc:
+    pathmatch:
+      matching-strategy: ANT_PATH_MATCHER # 解决springboot2.6整合swagger的bug
   datasource:
     url: jdbc:mysql://${hichat.mysql.ip}:${hichat.mysql.port}/${hichat.mysql.db}?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai
     username: ${hichat.mysql.username}
