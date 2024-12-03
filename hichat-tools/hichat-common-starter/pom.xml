@@ -77,7 +77,7 @@
         <!--knife4j-->
         <dependency>
             <groupId>com.github.xiaoymin</groupId>
-            <artifactId>knife4j-spring-boot-starter</artifactId>
+            <artifactId>knife4j-openapi2-spring-boot-starter</artifactId>
         </dependency>
         <!--springboot-test-->
         <dependency>
