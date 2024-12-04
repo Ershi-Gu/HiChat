@@ -1,5 +1,6 @@
 package com.ershi.hichat.common.common.domain.vo;
 
+import com.ershi.hichat.common.common.exception.ErrorEnum;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -57,6 +58,19 @@ public class ApiResult<T> {
         result.setSuccess(Boolean.FALSE);
         result.setErrCode(code);
         result.setErrMsg(msg);
+        return result;
+    }
+
+    /**
+     * 失败返回
+     * @param errorEnum 异常枚举类
+     * @return {@link ApiResult}<{@link T}>
+     */
+    public static <T> ApiResult<T> fail(ErrorEnum errorEnum) {
+        ApiResult<T> result = new ApiResult<T>();
+        result.setSuccess(Boolean.FALSE);
+        result.setErrCode(errorEnum.getErrorCode());
+        result.setErrMsg(errorEnum.getErrorMsg());
         return result;
     }
 
