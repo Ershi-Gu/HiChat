@@ -39,8 +39,9 @@ public class LoginServiceImpl implements LoginService {
      */
     @Override
     public String login(Long uid) {
+        // 获取token
         String token = jwtUtils.createToken(uid);
-        // todo token验证、过期、续期（Redis中心化）
+        // 将token保存到Redis中心化管理
         String userTokenKey = getUserTokenKey(uid);
         RedisUtils.set(userTokenKey, token, TOKEN_EXPIRE_DAYS, TimeUnit.DAYS);
         return token;
