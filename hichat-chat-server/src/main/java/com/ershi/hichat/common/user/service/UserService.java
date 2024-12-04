@@ -2,6 +2,7 @@ package com.ershi.hichat.common.user.service;
 
 import com.ershi.hichat.common.user.domain.entity.User;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.ershi.hichat.common.user.domain.vo.response.user.UserInfoResp;
 
 /**
  * <p>
@@ -15,4 +16,7 @@ public interface UserService {
 
 
     Long register(User insert);
+
+
+    UserInfoResp getUserInfo(Long uid);
 }
