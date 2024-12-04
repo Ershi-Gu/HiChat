@@ -1,4 +1,4 @@
-package com.ershi.hichat.common.user.domain.vo.request.ws;
+package com.ershi.hichat.common.websocket.domain.vo.request;
 
 import com.ershi.hichat.common.user.domain.enums.WSReqTypeEnum;
 import lombok.Data;
