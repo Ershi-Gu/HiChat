@@ -46,6 +46,14 @@ public class TokenInterceptor implements HandlerInterceptor {
     @Autowired
     private LoginService loginService;
 
+    /**
+     * 请求前校验登录态
+     * @param request
+     * @param response
+     * @param handler
+     * @return boolean
+     * @throws Exception
+     */
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
         // 获取 Token
