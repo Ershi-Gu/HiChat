@@ -9,7 +9,7 @@ import lombok.AllArgsConstructor;
  * @date 2024/12/05
  */
 @AllArgsConstructor
-public enum BusinessExceptionEnum implements ErrorEnum{
+public enum BusinessErrorEnum implements ErrorEnum{
 
     BUSINESS_ERROR(1001, "通用业务异常"),
     ;
