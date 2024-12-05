@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 /**
  * 全局异常捕获
+ *
  * @author Ershi
  * @date 2024/12/05
  */
@@ -31,6 +32,7 @@ public class GlobalExceptionHandler {
 
     /**
      * 业务异常处理
+     *
      * @param e
      * @return {@link ApiResult}<{@link Void}>
      */
@@ -42,12 +44,13 @@ public class GlobalExceptionHandler {
 
     /**
      * 未知异常兜底
+     *
      * @param e
      * @return {@link ApiResult}<{@link Void}>
      */
     @ExceptionHandler(Exception.class)
     public ApiResult<Void> systemExceptionHandler(Exception e) {
-        log.error("System Exception! The reason is: {}", e.getMessage());
+        log.error("System Exception! The reason is: {}", e.getMessage(), e);
         return ApiResult.fail(SystemCommonErrorEnum.SYSTEM_ERROR);
     }
 

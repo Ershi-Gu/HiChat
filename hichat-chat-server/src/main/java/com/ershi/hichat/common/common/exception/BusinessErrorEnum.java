@@ -11,7 +11,7 @@ import lombok.AllArgsConstructor;
 @AllArgsConstructor
 public enum BusinessErrorEnum implements ErrorEnum{
 
-    BUSINESS_ERROR(1001, "通用业务异常"),
+    BUSINESS_ERROR(1001, "{0}"),
     ;
 
     private Integer errorCode;
