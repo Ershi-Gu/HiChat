@@ -3,14 +3,15 @@ package com.ershi.hichat.common.user.controller;
 
 import com.ershi.hichat.common.common.domain.vo.ApiResult;
 import com.ershi.hichat.common.common.utils.RequestHolder;
+import com.ershi.hichat.common.user.domain.vo.request.ModifyNameRequest;
 import com.ershi.hichat.common.user.domain.vo.response.user.UserInfoResp;
 import com.ershi.hichat.common.user.service.UserService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import javax.validation.Valid;
 
 /**
  * <p>
@@ -33,6 +34,14 @@ public class UserController {
     public ApiResult<UserInfoResp> getUserInfo() {
         return ApiResult.success(userService.getUserInfo(RequestHolder.get().getUid()));
     }
+
+    @PutMapping("/name")
+    @ApiOperation("修改用户名")
+    public ApiResult<Void> modifyName(@Valid @RequestBody ModifyNameRequest modifyNameRequest) {
+        userService.modifyName(RequestHolder.get().getUid(), modifyNameRequest.getName());
+        return ApiResult.success();
+    }
+
 
 }
 

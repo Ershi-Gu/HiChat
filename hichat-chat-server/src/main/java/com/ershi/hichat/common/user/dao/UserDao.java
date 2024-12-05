@@ -14,11 +14,35 @@ import org.springframework.stereotype.Service;
  * @since 2024-11-25
  */
 @Service
-public class UserDao extends ServiceImpl<UserMapper, User>{
+public class UserDao extends ServiceImpl<UserMapper, User> {
 
     public User getByOpenId(String openId) {
         return lambdaQuery()
                 .eq(User::getOpenId, openId)
                 .one();
+    }
+
+    /**
+     * 通过name获取User对象
+     *
+     * @param name
+     * @return {@link User} 若无匹配数据返回null
+     */
+    public User getByName(String name) {
+        return lambdaQuery()
+                .eq(User::getName, name)
+                .one();
+    }
+
+    /**
+     * 修改用户名
+     * @param uid
+     * @param name
+     */
+    public void modifyName(Long uid, String name) {
+        lambdaUpdate()
+                .eq(User::getId, uid)
+                .set(User::getName, name)
+                .update();
     }
 }
