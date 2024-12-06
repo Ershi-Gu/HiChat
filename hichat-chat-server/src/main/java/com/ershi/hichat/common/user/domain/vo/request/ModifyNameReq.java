@@ -13,7 +13,7 @@ import javax.validation.constraints.NotNull;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class ModifyNameRequest {
+public class ModifyNameReq {
 
     @NotNull
     @Length(max = 6, message = "用户名不能超过6位噢")
