@@ -40,7 +40,7 @@ public class UserBackpackDao extends ServiceImpl<UserBackpackMapper, UserBackpac
      *
      * @param uid    用户id
      * @param itemId 物品id
-     * @return boolean 是否获取到
+     * @return {@link UserBackpack} 没有物品返回null
      */
     public UserBackpack getFirstValidItem(Long uid, Long itemId) {
         return lambdaQuery()

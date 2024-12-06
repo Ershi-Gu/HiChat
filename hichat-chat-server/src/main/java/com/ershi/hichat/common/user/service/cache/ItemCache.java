@@ -10,6 +10,11 @@ import java.util.List;
 
 import static com.ershi.hichat.common.common.constant.SpringCacheConstant.ITEM_CACHE_NAMES;
 
+/**
+ * 物品数据本地缓存
+ * @author Ershi
+ * @date 2024/12/06
+ */
 @Component
 public class ItemCache {
 
