@@ -4,6 +4,7 @@ package com.ershi.hichat.common.user.controller;
 import com.ershi.hichat.common.common.domain.vo.ApiResult;
 import com.ershi.hichat.common.common.utils.RequestHolder;
 import com.ershi.hichat.common.user.domain.vo.request.ModifyNameRequest;
+import com.ershi.hichat.common.user.domain.vo.response.user.BadgeResp;
 import com.ershi.hichat.common.user.domain.vo.response.user.UserInfoResp;
 import com.ershi.hichat.common.user.service.UserService;
 import io.swagger.annotations.Api;
@@ -12,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.List;
 
 /**
  * <p>
@@ -40,6 +42,12 @@ public class UserController {
     public ApiResult<Void> modifyName(@Valid @RequestBody ModifyNameRequest modifyNameRequest) {
         userService.modifyName(RequestHolder.get().getUid(), modifyNameRequest.getName());
         return ApiResult.success();
+    }
+
+    @GetMapping("/badges")
+    @ApiOperation("可选徽章预览")
+    public ApiResult<List<BadgeResp>> badges() {
+        return ApiResult.success(userService.badges(RequestHolder.get().getUid()));
     }
 
 

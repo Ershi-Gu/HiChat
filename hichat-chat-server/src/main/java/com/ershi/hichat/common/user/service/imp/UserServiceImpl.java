@@ -1,22 +1,26 @@
 package com.ershi.hichat.common.user.service.imp;
 
-import com.ershi.hichat.common.common.exception.BusinessException;
+import cn.hutool.core.collection.CollUtil;
 import com.ershi.hichat.common.common.utils.AssertUtil;
 import com.ershi.hichat.common.user.dao.UserBackpackDao;
 import com.ershi.hichat.common.user.dao.UserDao;
+import com.ershi.hichat.common.user.domain.entity.ItemConfig;
 import com.ershi.hichat.common.user.domain.entity.User;
 import com.ershi.hichat.common.user.domain.entity.UserBackpack;
 import com.ershi.hichat.common.user.domain.enums.ItemEnum;
-import com.ershi.hichat.common.user.domain.vo.request.ModifyNameRequest;
+import com.ershi.hichat.common.user.domain.enums.ItemTypeEnum;
+import com.ershi.hichat.common.user.domain.vo.response.user.BadgeResp;
 import com.ershi.hichat.common.user.domain.vo.response.user.UserInfoResp;
 import com.ershi.hichat.common.user.service.UserService;
 import com.ershi.hichat.common.user.service.adapter.UserAdapter;
-import org.checkerframework.checker.units.qual.A;
+import com.ershi.hichat.common.user.service.cache.ItemCache;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Objects;
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
 
 
 @Service
@@ -27,6 +31,9 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     private UserBackpackDao userBackpackDao;
+
+    @Autowired
+    private ItemCache itemCache;
 
     /**
      * 注册
@@ -80,6 +87,27 @@ public class UserServiceImpl implements UserService {
             // 改名
             userDao.modifyName(uid, name);
         }
+    }
+
+    /**
+     * 可选徽章预览，优先展示已佩戴的和已拥有的
+     *
+     * @param uid 用户id
+     * @return {@link List}<{@link BadgeResp}> 所有徽章列表，包括可选和不可选的
+     */
+    @Override
+    public List<BadgeResp> badges(Long uid) {
+        // 查询所有徽章
+        List<ItemConfig> itemConfigs = itemCache.getByType(ItemTypeEnum.BADGE.getType());
+        if (CollUtil.isEmpty(itemConfigs)) { // 如果系统暂无徽章，返回空
+            return Collections.emptyList();
+        }
+        // 查询用户拥有的徽章
+        List<UserBackpack> backpacks = userBackpackDao.getByItemsId(uid,
+                itemConfigs.stream().map(ItemConfig::getId).collect(Collectors.toList()));
+        //查询用户当前佩戴的标签
+        User user = userDao.getById(uid);
+        return UserAdapter.buildBadgeResp(itemConfigs, backpacks, user);
     }
 
 }

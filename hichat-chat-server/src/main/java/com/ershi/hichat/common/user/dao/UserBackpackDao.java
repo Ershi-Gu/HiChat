@@ -2,9 +2,12 @@ package com.ershi.hichat.common.user.dao;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.ershi.hichat.common.user.domain.entity.UserBackpack;
+import com.ershi.hichat.common.user.domain.enums.ItemTypeEnum;
 import com.ershi.hichat.common.user.domain.enums.UseStatusEnum;
 import com.ershi.hichat.common.user.mapper.UserBackpackMapper;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 /**
  * <p>
@@ -62,5 +65,13 @@ public class UserBackpackDao extends ServiceImpl<UserBackpackMapper, UserBackpac
                 .set(UserBackpack::getStatus, UseStatusEnum.USED_ALREADY)
                 .update();
 
+    }
+
+    public List<UserBackpack> getByItemsId(Long uid, List<Long> itemIds) {
+        return lambdaQuery()
+                .eq(UserBackpack::getUid, uid)
+                .in(UserBackpack::getItemId, itemIds)
+                .eq(UserBackpack::getStatus, UseStatusEnum.TO_BE_USED.getStatus())
+                .list();
     }
 }

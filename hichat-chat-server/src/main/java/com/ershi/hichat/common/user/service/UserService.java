@@ -3,7 +3,10 @@ package com.ershi.hichat.common.user.service;
 import com.ershi.hichat.common.user.domain.entity.User;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.ershi.hichat.common.user.domain.vo.request.ModifyNameRequest;
+import com.ershi.hichat.common.user.domain.vo.response.user.BadgeResp;
 import com.ershi.hichat.common.user.domain.vo.response.user.UserInfoResp;
+
+import java.util.List;
 
 /**
  * <p>
@@ -22,4 +25,6 @@ public interface UserService {
     UserInfoResp getUserInfo(Long uid);
 
     void modifyName(Long uid, String name);
+
+    List<BadgeResp> badges(Long uid);
 }
