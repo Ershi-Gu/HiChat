@@ -2,6 +2,7 @@ package com.ershi.hichat.common.user.service.imp;
 
 import cn.hutool.core.collection.CollUtil;
 import com.ershi.hichat.common.common.utils.AssertUtil;
+import com.ershi.hichat.common.common.utils.RequestHolder;
 import com.ershi.hichat.common.user.dao.UserBackpackDao;
 import com.ershi.hichat.common.user.dao.UserDao;
 import com.ershi.hichat.common.user.domain.entity.ItemConfig;
@@ -108,6 +109,22 @@ public class UserServiceImpl implements UserService {
         //查询用户当前佩戴的标签
         User user = userDao.getById(uid);
         return UserAdapter.buildBadgeResp(itemConfigs, backpacks, user);
+    }
+
+    /**
+     * 为当前用户佩戴目标徽章
+     * @param badgeId 徽章id
+     */
+    @Override
+    public void wearingBadges(Long badgeId) {
+        // 确保佩戴物品存在用户背包
+        UserBackpack firstValidItem = userBackpackDao.getFirstValidItem(RequestHolder.get().getUid(), badgeId);
+        AssertUtil.isNotEmpty(firstValidItem, "你还没有该物品哦，快去查看怎么获得吧~");
+        // 确保该物品类型是徽章
+        ItemConfig item = itemCache.getById(firstValidItem.getItemId());
+        AssertUtil.equal(item.getType(), ItemTypeEnum.BADGE.getType(), "该物品不可佩戴，请检查佩戴徽章是否正确！");
+        // 佩戴徽章
+        userDao.wearingBadges(RequestHolder.get().getUid(), badgeId);
     }
 
 }

@@ -45,4 +45,16 @@ public class UserDao extends ServiceImpl<UserMapper, User> {
                 .set(User::getName, name)
                 .update();
     }
+
+    /**
+     * 佩戴徽章
+     * @param uid
+     * @param badgeId
+     */
+    public void wearingBadges(Long uid, Long badgeId) {
+        lambdaUpdate()
+                .eq(User::getId, uid)
+                .set(User::getItemId, badgeId)
+                .update();
+    }
 }

@@ -25,4 +25,6 @@ public interface UserService {
     void modifyName(Long uid, String name);
 
     List<BadgeResp> badges(Long uid);
+
+    void wearingBadges(Long badgeId);
 }

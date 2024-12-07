@@ -4,6 +4,7 @@ package com.ershi.hichat.common.user.controller;
 import com.ershi.hichat.common.common.domain.vo.ApiResult;
 import com.ershi.hichat.common.common.utils.RequestHolder;
 import com.ershi.hichat.common.user.domain.vo.request.ModifyNameReq;
+import com.ershi.hichat.common.user.domain.vo.request.WearingBadgesReq;
 import com.ershi.hichat.common.user.domain.vo.response.user.BadgeResp;
 import com.ershi.hichat.common.user.domain.vo.response.user.UserInfoResp;
 import com.ershi.hichat.common.user.service.UserService;
@@ -40,7 +41,7 @@ public class UserController {
     @PutMapping("/name")
     @ApiOperation("修改用户名")
     public ApiResult<Void> modifyName(@Valid @RequestBody ModifyNameReq modifyNameReq) {
-        userService.modifyName(RequestHolder.get().getUid(), modifyNameReq.getName());
+       userService.modifyName(RequestHolder.get().getUid(), modifyNameReq.getName());
         return ApiResult.success();
     }
 
@@ -49,5 +50,13 @@ public class UserController {
     public ApiResult<List<BadgeResp>> badges() {
         return ApiResult.success(userService.badges(RequestHolder.get().getUid()));
     }
+
+    @PutMapping("/badges")
+    @ApiOperation("佩戴徽章")
+    public ApiResult<Void> wearingBadges(@RequestBody WearingBadgesReq wearingBadgesReq) {
+        userService.wearingBadges(wearingBadgesReq.getBadgeId());
+        return ApiResult.success();
+    }
+
 }
 
