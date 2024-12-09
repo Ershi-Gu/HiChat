@@ -1,6 +1,7 @@
 package com.ershi.hichat.common.user.service.imp;
 
 import cn.hutool.core.collection.CollUtil;
+import com.ershi.hichat.common.common.annotation.RedissonLock;
 import com.ershi.hichat.common.common.utils.AssertUtil;
 import com.ershi.hichat.common.common.utils.RequestHolder;
 import com.ershi.hichat.common.user.dao.UserBackpackDao;

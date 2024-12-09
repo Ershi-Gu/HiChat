@@ -67,11 +67,29 @@ public class UserBackpackDao extends ServiceImpl<UserBackpackMapper, UserBackpac
 
     }
 
+    /**
+     * 查询用户拥有的某类待使用的所有物品
+     *
+     * @param uid     用户id
+     * @param itemIds 物品id
+     * @return {@link List}<{@link UserBackpack}> 拥有的所有待使用的该物品
+     */
     public List<UserBackpack> getByItemsId(Long uid, List<Long> itemIds) {
         return lambdaQuery()
                 .eq(UserBackpack::getUid, uid)
                 .in(UserBackpack::getItemId, itemIds)
                 .eq(UserBackpack::getStatus, UseStatusEnum.TO_BE_USED.getStatus())
                 .list();
+    }
+
+    /**
+     * 根据幂等号查询物品是否存在
+     * @param idempotentId 幂等号
+     * @return {@link UserBackpack} 存在返回对象，反之返回null
+     */
+    public UserBackpack getByIdp(String idempotentId) {
+        return lambdaQuery()
+                .eq(UserBackpack::getIdempotent, idempotentId)
+                .one();
     }
 }

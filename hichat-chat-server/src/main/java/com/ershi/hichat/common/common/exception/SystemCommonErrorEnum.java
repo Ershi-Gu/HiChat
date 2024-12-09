@@ -12,6 +12,7 @@ public enum SystemCommonErrorEnum implements ErrorEnum {
 
     SYSTEM_ERROR(-1, "系统出小差了，请稍后再试哦~"),
     PARAM_VALID(-2, "参数校验失败"),
+    LOCK_LIMIT(-3, "请求太频繁了，请稍后再试哦"),
     ;
 
     /**
