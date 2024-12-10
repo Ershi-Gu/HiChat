@@ -1,7 +1,6 @@
 package com.ershi.hichat.common.user.service.imp;
 
 import com.ershi.hichat.common.common.annotation.RedissonLock;
-import com.ershi.hichat.common.common.service.LockService;
 import com.ershi.hichat.common.user.dao.UserBackpackDao;
 import com.ershi.hichat.common.user.domain.entity.ItemConfig;
 import com.ershi.hichat.common.user.domain.entity.UserBackpack;

@@ -10,6 +10,7 @@ import java.util.Map;
 
 /**
  * 物品发放业务验证工厂
+ *
  * @author Ershi
  * @date 2024/12/08
  */
@@ -17,24 +18,30 @@ import java.util.Map;
 public class ItemValidatorFactory {
 
     /**
-     *保存所有验证器实例
+     * 保存所有验证器实例
      */
-    private final Map<String, ItemValidator> validatorMap = new HashMap<>();
+    private final Map<ItemTypeEnum, ItemValidator> validatorMap = new HashMap<>();
 
+    /**
+     * 注册验证器实例
+     *
+     * @param validators
+     */
     @Autowired
     public ItemValidatorFactory(List<ItemValidator> validators) {
         // 将所有 ItemValidator 实现类注册到 Map 中
-        validators.forEach(validator -> validatorMap.put(validator.getClass().getSimpleName(), validator));
+        validators.forEach(validator -> validatorMap.put(validator.getItemType(), validator));
     }
 
     /**
      * 根据物品类型获取对应的业务验证器
+     *
      * @param itemType
      * @return {@link ItemValidator}
      */
     public ItemValidator getValidator(Integer itemType) {
         ItemTypeEnum itemTypeEnum = ItemTypeEnum.of(itemType);
         // 根据物品类型获取校验器，未找到时使用默认校验器
-        return validatorMap.getOrDefault(itemTypeEnum.getDesc() + " Validator", new DefaultItemValidator());
+        return validatorMap.getOrDefault(itemTypeEnum, new DefaultItemValidator());
     }
 }
