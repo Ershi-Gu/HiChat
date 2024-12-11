@@ -18,6 +18,7 @@ import me.chanjar.weixin.mp.api.WxMpService;
 import me.chanjar.weixin.mp.bean.result.WxMpQrCodeTicket;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.time.Duration;
@@ -105,7 +106,7 @@ public class WebSocketServiceImpl implements WebSocketService {
     @Override
     public void remove(Channel channel) {
         ONLINE_WS_MAP.remove(channel);
-        // todo 用户下线
+        // todo 发出用户下线事件
     }
 
     /**
@@ -166,6 +167,7 @@ public class WebSocketServiceImpl implements WebSocketService {
      * @param token
      */
     @Override
+    @Async
     public void authorize(Channel channel, String token) {
         // 判断token是否有效
         Long validUid = loginService.getValidUid(token);
