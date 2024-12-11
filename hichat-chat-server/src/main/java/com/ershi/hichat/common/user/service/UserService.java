@@ -17,7 +17,7 @@ import java.util.List;
 public interface UserService {
 
 
-    Long register(User insert);
+    void register(User insert);
 
 
     UserInfoResp getUserInfo(Long uid);

@@ -38,7 +38,7 @@ public class UserBackpackServiceImpl implements UserBackpackService {
      * @param businessId           该渠道下的业务号，用于组装幂等号
      */
     @Override
-    public void acquireItem(Long uid, Long itemId, IdempotentSourceEnum idempotentSourceEnum, String businessId) throws Throwable {
+    public void acquireItem(Long uid, Long itemId, IdempotentSourceEnum idempotentSourceEnum, String businessId) {
         // 组装幂等号
         String idempotentId = getIdempotentId(itemId, idempotentSourceEnum, businessId);
         // 获取当前类的代理对象（避免this调用导致aop失效）

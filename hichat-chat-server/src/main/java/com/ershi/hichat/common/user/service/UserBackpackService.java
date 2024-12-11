@@ -19,7 +19,7 @@ public interface UserBackpackService {
      * @param idempotentSourceEnum 幂等号来源渠道类型
      * @param businessId 该渠道下的业务号，用于组装幂等号
      */
-    void acquireItem(Long uid, Long itemId, IdempotentSourceEnum idempotentSourceEnum, String businessId) throws Throwable;
+    void acquireItem(Long uid, Long itemId, IdempotentSourceEnum idempotentSourceEnum, String businessId);
 
     /**
      * 执行发放物品

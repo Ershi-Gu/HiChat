@@ -1,7 +1,7 @@
 package com.ershi.hichat.common.user.service.imp;
 
 import cn.hutool.core.collection.CollUtil;
-import com.ershi.hichat.common.common.annotation.RedissonLock;
+import com.ershi.hichat.common.common.event.UserRegisterEvent;
 import com.ershi.hichat.common.common.utils.AssertUtil;
 import com.ershi.hichat.common.common.utils.RequestHolder;
 import com.ershi.hichat.common.user.dao.UserBackpackDao;
@@ -17,6 +17,7 @@ import com.ershi.hichat.common.user.service.UserService;
 import com.ershi.hichat.common.user.service.adapter.UserAdapter;
 import com.ershi.hichat.common.user.service.cache.ItemCache;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -37,6 +38,9 @@ public class UserServiceImpl implements UserService {
     @Autowired
     private ItemCache itemCache;
 
+    @Autowired
+    private ApplicationEventPublisher applicationEventPublisher;
+
     /**
      * 注册
      *
@@ -44,12 +48,11 @@ public class UserServiceImpl implements UserService {
      * @return {@link Long}
      */
     @Override
-    @Transactional
-    public Long register(User insert) {
+    public void register(User insert) {
+        // 注册用户到数据库
         boolean save = userDao.save(insert);
-        // todo 用户注册的事件
-        return null;
-
+        // 发送用户注册的事件
+        applicationEventPublisher.publishEvent(new UserRegisterEvent(this, insert));
     }
 
     /**
