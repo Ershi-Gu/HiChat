@@ -17,6 +17,7 @@ import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
 import io.netty.handler.stream.ChunkedWriteHandler;
 import io.netty.handler.timeout.IdleStateHandler;
+import io.netty.util.NettyRuntime;
 import io.netty.util.concurrent.Future;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Configuration;
@@ -45,8 +46,8 @@ public class NettyWebSocketServer {
     private static final NettyWebSocketServerHandler NETTY_WEB_SOCKET_SERVER_HANDLER = new NettyWebSocketServerHandler();
 
     // 创建事件循环组（线程池执行器）
-    private EventLoopGroup bossGroup = new NioEventLoopGroup(); // 处理 Accept 事件
-    private EventLoopGroup workGroup = new NioEventLoopGroup(); // 处理 IO 事件
+    private EventLoopGroup bossGroup = new NioEventLoopGroup(1); // 处理 Accept 事件
+    private EventLoopGroup workGroup = new NioEventLoopGroup(NettyRuntime.availableProcessors()); // 处理 IO 事件
 
     /**
      * 启动 websocket server（在依赖注入完成后自动执行）
