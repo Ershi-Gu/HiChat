@@ -62,7 +62,7 @@ public class UserBackpackDao extends ServiceImpl<UserBackpackMapper, UserBackpac
         return lambdaUpdate()
                 .eq(UserBackpack::getId, item.getId())
                 .eq(UserBackpack::getStatus, item.getStatus())
-                .set(UserBackpack::getStatus, UseStatusEnum.USED_ALREADY)
+                .set(UserBackpack::getStatus, UseStatusEnum.USED_ALREADY.getStatus())
                 .update();
 
     }
