@@ -128,16 +128,16 @@ public class WebSocketServiceImpl implements WebSocketService {
         // 调用登录模块获取token
         String token = loginService.login(uid);
         // 推送用户登录成功通知
-        loginSuccess(channel, user, token);
+        publishLoginSuccess(channel, user, token);
     }
 
     /**
-     * 通用推送前端登录成功信息
+     * 广播登录成功信息
      * @param channel
      * @param user
      * @param token
      */
-    private void loginSuccess(Channel channel, User user, String token) {
+    private void publishLoginSuccess(Channel channel, User user, String token) {
         // 保存channel-uid映射
         WSChannelExtraDTO wsChannelExtraDTO = ONLINE_WS_MAP.get(channel);
         wsChannelExtraDTO.setUid(user.getId());
@@ -174,7 +174,7 @@ public class WebSocketServiceImpl implements WebSocketService {
         if (Objects.nonNull(validUid)) {
             // token有效，通知登录成功，携带用户信息
             User user = userDao.getById(validUid);
-            loginSuccess(channel, user, token);
+            publishLoginSuccess(channel, user, token);
         } else {
             // 通知前端token失效，请删除
             sendMsg(channel, WebSocketAdapter.buildInvalidTokenResp());
