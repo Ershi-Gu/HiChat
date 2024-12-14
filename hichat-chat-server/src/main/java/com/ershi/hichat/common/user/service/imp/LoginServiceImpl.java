@@ -2,7 +2,7 @@ package com.ershi.hichat.common.user.service.imp;
 
 import com.ershi.hichat.common.common.utils.JwtUtils;
 import com.ershi.hichat.common.user.service.LoginService;
-import com.ershi.hichat.common.user.service.cache.UserCache;
+import com.ershi.hichat.common.user.service.cache.UserLoginCache;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
@@ -23,7 +23,7 @@ public class LoginServiceImpl implements LoginService {
     private JwtUtils jwtUtils;
 
     @Autowired
-    private UserCache userCache;
+    private UserLoginCache userLoginCache;
 
 
     /**
@@ -37,7 +37,7 @@ public class LoginServiceImpl implements LoginService {
         // 获取token
         String token = jwtUtils.createToken(uid);
         // 将token保存到Redis中心化管理
-        userCache.saveUserToken(token, uid);
+        userLoginCache.saveUserToken(token, uid);
         return token;
     }
 
@@ -49,7 +49,7 @@ public class LoginServiceImpl implements LoginService {
     @Async
     public void renewalTokenIfNecessary(String token) {
         Long uid = getValidUid(token);
-        userCache.refreshTokenExpireTime(uid);
+        userLoginCache.refreshTokenExpireTime(uid);
     }
 
     /**
@@ -66,7 +66,7 @@ public class LoginServiceImpl implements LoginService {
             return null;
         }
         // 验证token是否过期
-        String tokenByRedis = userCache.getUserToken(uid);
+        String tokenByRedis = userLoginCache.getUserToken(uid);
         if (StringUtils.isBlank(tokenByRedis)) {
             return null;
         }

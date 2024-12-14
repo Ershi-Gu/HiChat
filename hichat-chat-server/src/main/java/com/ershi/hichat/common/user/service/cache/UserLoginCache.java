@@ -2,18 +2,17 @@ package com.ershi.hichat.common.user.service.cache;
 
 import com.ershi.hichat.common.common.constant.RedisKey;
 import com.ershi.hichat.utils.RedisUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 
 import java.util.concurrent.TimeUnit;
 
 /**
- * 用户信息缓存
+ * 用户登录缓存
  * @author Ershi
  * @date 2024/12/14
  */
 @Component
-public class UserCache {
+public class UserLoginCache {
 
     public static final int REMAINING_EXPIRE_TIME_SECONDS = 86400;
 
