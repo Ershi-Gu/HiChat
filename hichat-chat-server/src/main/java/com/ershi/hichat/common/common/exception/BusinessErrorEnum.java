@@ -12,6 +12,7 @@ import lombok.AllArgsConstructor;
 public enum BusinessErrorEnum implements ErrorEnum{
 
     BUSINESS_ERROR(1001, "{0}"),
+    IP_ANALYSIS_ERROR(1002, "ip解析失败");
     ;
 
     private Integer errorCode;

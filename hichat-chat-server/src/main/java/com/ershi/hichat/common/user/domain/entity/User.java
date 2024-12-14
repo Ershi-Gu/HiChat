@@ -4,9 +4,9 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import lombok.Builder;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
+import lombok.*;
+import org.apache.commons.lang3.StringUtils;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -21,8 +21,10 @@ import java.util.Date;
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
-@TableName("user")
 @Builder
+@AllArgsConstructor
+@NoArgsConstructor
+@TableName(value = "user", autoResultMap = true)
 public class User implements Serializable {
 
     private static final long serialVersionUID = 1396825334118508384L;
@@ -72,8 +74,8 @@ public class User implements Serializable {
     /**
      * ip信息
      */
-    @TableField("ip_info")
-    private String ipInfo;
+    @TableField(value = "ip_info", typeHandler = JacksonTypeHandler.class)
+    private IpInfo ipInfo;
 
     /**
      * 佩戴的徽章id
@@ -100,4 +102,17 @@ public class User implements Serializable {
     private Date updateTime;
 
 
+    /**
+     * 刷新当前用户ip相关信息
+     * @param ip
+     */
+    public void refreshIpInfo(String ip) {
+        if (ipInfo == null) {
+            ipInfo = new IpInfo();
+        }
+        if (StringUtils.isBlank(ip)) {
+            return;
+        }
+        ipInfo.refresh(ip);
+    }
 }

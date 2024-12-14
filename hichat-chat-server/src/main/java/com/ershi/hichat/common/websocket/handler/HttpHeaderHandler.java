@@ -2,10 +2,14 @@ package com.ershi.hichat.common.websocket.handler;
 
 import cn.hutool.core.net.url.UrlBuilder;
 import com.ershi.hichat.common.websocket.utils.NettyUtil;
+import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.handler.codec.http.FullHttpRequest;
+import io.netty.handler.codec.http.HttpHeaders;
+import org.apache.commons.lang3.StringUtils;
 
+import java.net.InetSocketAddress;
 import java.util.Optional;
 
 /**
@@ -14,6 +18,7 @@ import java.util.Optional;
  * @author Ershi
  * @date 2024/12/01
  */
+@ChannelHandler.Sharable
 public class HttpHeaderHandler extends ChannelInboundHandlerAdapter {
 
     /**
@@ -27,18 +32,31 @@ public class HttpHeaderHandler extends ChannelInboundHandlerAdapter {
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
         // 判断接收到的消息是否为HttpRequest实例
         if (msg instanceof FullHttpRequest) {
-            // 对HttpRequest实例进行处理
             FullHttpRequest request = (FullHttpRequest) msg;
-            // 解析请求URI并构建UrlBuilder对象，用于后续获取查询参数
             UrlBuilder urlBuilder = UrlBuilder.ofHttp(request.uri());
 
-            // 从查询参数中获取token，如果不存在，则默认为空字符串
-            String token = Optional.ofNullable(urlBuilder.getQuery()).map(k -> k.get("token")).map(CharSequence::toString).orElse("");
-            // 将获取到的token作为属性存储在通道中，以供后续使用
+            // 获取token
+            String token = Optional
+                    .ofNullable(urlBuilder.getQuery()).
+                    map(k -> k.get("token")).
+                    map(CharSequence::toString).
+                    orElse("");
             NettyUtil.setAttr(ctx.channel(), NettyUtil.TOKEN, token);
             // 移除token参数，为了路径后续能够匹配到websocket升级处理器
             request.setUri(urlBuilder.getPath().toString());
+
+            // 获取ip
+            HttpHeaders headers = request.headers();
+            String ip = headers.get("X-Real-IP");
+            if (StringUtils.isEmpty(ip)) {//如果没经过nginx，就直接获取远端地址
+                InetSocketAddress address = (InetSocketAddress) ctx.channel().remoteAddress();
+                ip = address.getAddress().getHostAddress();
+            }
+            NettyUtil.setAttr(ctx.channel(), NettyUtil.IP, ip);
+            ctx.fireChannelRead(request);
+
+        } else {
+            ctx.fireChannelRead(msg);
         }
-        ctx.fireChannelRead(msg);
     }
 }

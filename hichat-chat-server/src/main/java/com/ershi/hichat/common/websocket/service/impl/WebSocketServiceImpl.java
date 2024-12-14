@@ -2,13 +2,16 @@ package com.ershi.hichat.common.websocket.service.impl;
 
 import cn.hutool.core.util.RandomUtil;
 import cn.hutool.json.JSONUtil;
+import com.ershi.hichat.common.common.event.UserOnlineEvent;
 import com.ershi.hichat.common.user.dao.UserDao;
 import com.ershi.hichat.common.user.domain.entity.User;
+import com.ershi.hichat.common.user.domain.enums.ChatActiveStatusEnum;
 import com.ershi.hichat.common.user.domain.vo.response.ws.WSBaseResp;
 import com.ershi.hichat.common.user.service.LoginService;
 import com.ershi.hichat.common.websocket.domain.dto.WSChannelExtraDTO;
 import com.ershi.hichat.common.websocket.service.WebSocketService;
 import com.ershi.hichat.common.websocket.service.adapter.WebSocketAdapter;
+import com.ershi.hichat.common.websocket.utils.NettyUtil;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import io.netty.channel.Channel;
@@ -17,11 +20,13 @@ import lombok.SneakyThrows;
 import me.chanjar.weixin.mp.api.WxMpService;
 import me.chanjar.weixin.mp.bean.result.WxMpQrCodeTicket;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.time.Duration;
+import java.util.Date;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -49,6 +54,9 @@ public class WebSocketServiceImpl implements WebSocketService {
      */
     @Autowired
     private LoginService loginService;
+
+    @Autowired
+    private ApplicationEventPublisher applicationEventPublisher;
 
     /**
      * 管理所有在线用户的连接（登录态/游客）
@@ -141,9 +149,27 @@ public class WebSocketServiceImpl implements WebSocketService {
         // 保存channel-uid映射
         WSChannelExtraDTO wsChannelExtraDTO = ONLINE_WS_MAP.get(channel);
         wsChannelExtraDTO.setUid(user.getId());
-        // todo 推送用户上线成功事件
+        // 更新相关在线信息
+        updateUserOnlineInfo(channel, user);
+        applicationEventPublisher.publishEvent(new UserOnlineEvent(this, user));
         // 推送前端登录成功消息
         sendMsg(channel, WebSocketAdapter.buildTokenResp(user, token));
+    }
+
+    /**
+     * 用户上线后更新当前用户相关在线信息 <br>
+     * 1. 在线状态 Active <br>
+     * 2. ip <br>
+     * 3. 最新上线时间 last_option_time
+     *
+     * @param channel
+     * @param user
+     */
+    public void updateUserOnlineInfo(Channel channel, User user) {
+        user.setActiveStatus(ChatActiveStatusEnum.ONLINE.getStatus());
+        user.setLastOptTime(new Date());
+        String ip = channel.attr(NettyUtil.IP).get();
+        user.refreshIpInfo(ip);
     }
 
     /**

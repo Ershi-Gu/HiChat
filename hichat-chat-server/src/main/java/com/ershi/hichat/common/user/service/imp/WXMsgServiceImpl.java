@@ -104,7 +104,6 @@ public class WXMsgServiceImpl implements WXMsgService {
         boolean authorized = registered && StringUtil.isNotBlank(user.getAvatar());
         // 用户已注册并微信授权（用户不是第一次登录）
         if (registered && authorized){
-            // todo 登录成功逻辑 => 通过code找到channel推送消息
             webSocketService.scanLoginSuccess(code, user.getId());
         }
         // 用户未注册 => 走注册的逻辑

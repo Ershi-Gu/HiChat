@@ -45,6 +45,11 @@ public class NettyWebSocketServer {
      */
     private static final NettyWebSocketServerHandler NETTY_WEB_SOCKET_SERVER_HANDLER = new NettyWebSocketServerHandler();
 
+    /**
+     * 请求头处理器（全局共享）
+     */
+    private static final HttpHeaderHandler HTTP_HEADER_HANDLER = new HttpHeaderHandler();
+
     // 创建事件循环组（线程池执行器）
     private EventLoopGroup bossGroup = new NioEventLoopGroup(1); // 处理 Accept 事件
     private EventLoopGroup workGroup = new NioEventLoopGroup(NettyRuntime.availableProcessors()); // 处理 IO 事件
@@ -108,7 +113,7 @@ public class NettyWebSocketServer {
                          * 说明：
                          * 1. http请求头处理器，获取token进行握手认证
                          */
-                        pipeline.addLast(new HttpHeaderHandler());
+                        pipeline.addLast(HTTP_HEADER_HANDLER);
                         /**
                          * 说明：
                          *  1. 该处理器用于升级 HTTP 协议到 WebSocket
