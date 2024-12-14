@@ -63,6 +63,8 @@ public class TokenInterceptor implements HandlerInterceptor {
         if (Objects.nonNull(validUid)) {
             // 有登录态,设置登录态到 request 中
             request.setAttribute(ATTRIBUTE_UID, validUid);
+            // 刷新 Token 有效期
+            loginService.renewalTokenIfNecessary(token);
         } else {
             // 判断是否是公共接口
             boolean isPublicURI = isPublicURI(request);
