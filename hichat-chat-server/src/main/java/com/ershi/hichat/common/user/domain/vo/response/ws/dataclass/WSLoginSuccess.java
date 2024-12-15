@@ -33,7 +33,7 @@ public class WSLoginSuccess {
      */
     private String name;
     /**
-     * todo 用户权限 0普通用户 1超管
+     * 用户最高权限，大于0后值越小身份越高 -> 0普通用户 1超管....
      */
-    private Integer power;
+    private Integer rule;
 }

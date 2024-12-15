@@ -7,5 +7,14 @@ package com.ershi.hichat.common.common.constant;
  */
 public class SpringCacheConstant {
 
+    /**
+     * 物品缓存
+     */
     public static final String ITEM_CACHE_NAMES = "item";
+
+    /**
+     * 用户缓存
+     */
+    public static final String USER_CACHE_NAME = "user";
+
 }

@@ -9,10 +9,11 @@ import lombok.AllArgsConstructor;
  * @date 2024/12/05
  */
 @AllArgsConstructor
-public enum BusinessErrorEnum implements ErrorEnum{
+public enum BusinessErrorEnum implements ErrorEnum {
 
     BUSINESS_ERROR(1001, "{0}"),
-    IP_ANALYSIS_ERROR(1002, "ip解析失败");
+    IP_ANALYSIS_ERROR(1002, "ip解析失败"),
+    NO_AUTH(4001, "当前用户权限不足"),
     ;
 
     private Integer errorCode;
