@@ -113,6 +113,13 @@ public class AssertUtil {
         }
     }
 
+    // 如果不是非null对象，抛异常
+    public static void nonNull(Object obj, String msg) {
+        if (Objects.isNull(obj)) {
+            throwException(msg);
+        }
+    }
+
     //如果不是非空对象，则抛异常
     public static void isNotEmpty(Object obj, String msg) {
         if (isEmpty(obj)) {

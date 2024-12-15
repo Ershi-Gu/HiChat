@@ -34,12 +34,10 @@ public class RedissonLockAspect {
      * @param joinPoint
      * @return {@link Object}
      */
-    @Around("@annotation(com.ershi.hichat.common.common.annotation.RedissonLock)")
-    public Object around(ProceedingJoinPoint joinPoint) throws Throwable {
+    @Around("@annotation(redissonLock)")
+    public Object around(ProceedingJoinPoint joinPoint, RedissonLock redissonLock) throws Throwable {
         // 获取被拦截方法的方法对象
         Method method = ((MethodSignature) joinPoint.getSignature()).getMethod();
-        // 获取方法上的RedissonLock注解
-        RedissonLock redissonLock = method.getAnnotation(RedissonLock.class);
         // 确定锁的前缀key：如果注解的prefixKey属性为空，则使用SpEl表达式获取“类名#方法名”；否则使用prefixKey属性值
         String prefix = StrUtil.isBlank(redissonLock.prefixKey()) ? SpElUtils.getMethodKey(method) : redissonLock.prefixKey();//默认方法限定名+注解排名（可能多个）
         // 解析SpEl表达式，获取锁的键值
