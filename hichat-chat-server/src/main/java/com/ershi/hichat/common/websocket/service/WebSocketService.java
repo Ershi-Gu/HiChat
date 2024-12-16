@@ -1,6 +1,9 @@
 package com.ershi.hichat.common.websocket.service;
 
+import com.ershi.hichat.common.websocket.domain.vo.response.WSBaseResp;
 import io.netty.channel.Channel;
+
+import java.util.List;
 
 /**
  * @author Ershi
@@ -19,4 +22,6 @@ public interface WebSocketService {
     void waitAuthorize(Integer code);
 
     void authorize(Channel channel, String token);
+
+    void sendMsgToAllOnline(WSBaseResp<?> wsBaseResp, List<Long> skipUid);
 }

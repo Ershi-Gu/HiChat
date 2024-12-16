@@ -1,8 +1,11 @@
 package com.ershi.hichat.common.user.controller;
 
 
+import com.ershi.hichat.common.common.annotation.AuthCheck;
 import com.ershi.hichat.common.common.domain.vo.ApiResult;
 import com.ershi.hichat.common.common.utils.RequestHolder;
+import com.ershi.hichat.common.user.domain.enums.RoleEnum;
+import com.ershi.hichat.common.user.domain.vo.request.BlackReq;
 import com.ershi.hichat.common.user.domain.vo.request.ModifyNameReq;
 import com.ershi.hichat.common.user.domain.vo.request.WearingBadgesReq;
 import com.ershi.hichat.common.user.domain.vo.response.user.BadgeResp;
@@ -55,6 +58,22 @@ public class UserController {
     @ApiOperation("佩戴徽章")
     public ApiResult<Void> wearingBadges(@RequestBody WearingBadgesReq wearingBadgesReq) {
         userService.wearingBadges(wearingBadgesReq.getBadgeId());
+        return ApiResult.success();
+    }
+
+    @PutMapping("/blackUser")
+    @AuthCheck(requiredAuth = RoleEnum.ADMIN)
+    @ApiOperation("拉黑用户")
+    public ApiResult<Void> blackUser(@Valid @RequestBody BlackReq blackReq) {
+        userService.blackUser(blackReq.getUid());
+        return ApiResult.success();
+    }
+
+    @PutMapping("/blackUserAndIp")
+    @AuthCheck(requiredAuth = RoleEnum.ADMIN)
+    @ApiOperation("拉黑用户及其ip")
+    public ApiResult<Void> blackUserAndIp(@Valid @RequestBody BlackReq blackReq) {
+        userService.blackUserAndIp(blackReq.getUid());
         return ApiResult.success();
     }
 

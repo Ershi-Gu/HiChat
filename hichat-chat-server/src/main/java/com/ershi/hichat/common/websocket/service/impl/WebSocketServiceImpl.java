@@ -2,12 +2,14 @@ package com.ershi.hichat.common.websocket.service.impl;
 
 import cn.hutool.core.util.RandomUtil;
 import cn.hutool.json.JSONUtil;
+import com.ershi.hichat.common.common.config.ThreadPoolConfig;
 import com.ershi.hichat.common.common.event.UserOnlineEvent;
 import com.ershi.hichat.common.user.dao.UserDao;
 import com.ershi.hichat.common.user.domain.entity.User;
 import com.ershi.hichat.common.user.domain.enums.ChatActiveStatusEnum;
-import com.ershi.hichat.common.user.domain.vo.response.ws.WSBaseResp;
+import com.ershi.hichat.common.websocket.domain.vo.response.WSBaseResp;
 import com.ershi.hichat.common.user.service.LoginService;
+import com.ershi.hichat.common.user.service.UserRoleService;
 import com.ershi.hichat.common.websocket.domain.dto.WSChannelExtraDTO;
 import com.ershi.hichat.common.websocket.service.WebSocketService;
 import com.ershi.hichat.common.websocket.service.adapter.WebSocketAdapter;
@@ -20,13 +22,16 @@ import lombok.SneakyThrows;
 import me.chanjar.weixin.mp.api.WxMpService;
 import me.chanjar.weixin.mp.bean.result.WxMpQrCodeTicket;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.scheduling.annotation.Async;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Service;
 
 import java.time.Duration;
 import java.util.Date;
+import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -38,25 +43,6 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 @Service
 public class WebSocketServiceImpl implements WebSocketService {
-
-    /**
-     * 微信业务处理器
-     */
-    @Autowired
-    @Lazy // 解决 wxMpConfiguration -> scanHandler -> WXMsgServiceImpl -> webSocketServiceImpl 循环依赖
-    private WxMpService wxMpService;
-
-    @Autowired
-    private UserDao userDao;
-
-    /**
-     * 登录业务处理
-     */
-    @Autowired
-    private LoginService loginService;
-
-    @Autowired
-    private ApplicationEventPublisher applicationEventPublisher;
 
     /**
      * 管理所有在线用户的连接（登录态/游客）
@@ -79,6 +65,33 @@ public class WebSocketServiceImpl implements WebSocketService {
             .maximumSize(CODE_MAXIMUM_SIZE)
             .expireAfterWrite(CODE_EXPIRE_TIME)
             .build();
+
+    /**
+     * 微信业务处理器
+     */
+    @Autowired
+    @Lazy // 解决 wxMpConfiguration -> scanHandler -> WXMsgServiceImpl -> webSocketServiceImpl 循环依赖
+    private WxMpService wxMpService;
+
+    @Autowired
+    private UserDao userDao;
+
+    /**
+     * 登录业务处理
+     */
+    @Autowired
+    private LoginService loginService;
+
+    @Autowired
+    private ApplicationEventPublisher applicationEventPublisher;
+
+    @Autowired
+    private UserRoleService userRoleService;
+
+    @Autowired
+    @Qualifier(ThreadPoolConfig.WS_EXECUTOR)
+    private ThreadPoolTaskExecutor threadPoolTaskExecutor;
+
 
     /**
      * 保存ws连接
@@ -141,6 +154,7 @@ public class WebSocketServiceImpl implements WebSocketService {
 
     /**
      * 广播登录成功信息
+     *
      * @param channel
      * @param user
      * @param token
@@ -152,8 +166,10 @@ public class WebSocketServiceImpl implements WebSocketService {
         // 更新相关在线信息
         updateUserOnlineInfo(channel, user);
         applicationEventPublisher.publishEvent(new UserOnlineEvent(this, user));
+        // 获取用户最高权限
+        Integer userTopRule = userRoleService.getUserTopRule(user.getId());
         // 推送前端登录成功消息
-        sendMsg(channel, WebSocketAdapter.buildTokenResp(user, token));
+        sendMsg(channel, WebSocketAdapter.buildTokenResp(user, token, userTopRule));
     }
 
     /**
@@ -215,6 +231,23 @@ public class WebSocketServiceImpl implements WebSocketService {
      */
     private <T> void sendMsg(Channel channel, WSBaseResp<T> msg) {
         channel.writeAndFlush(new TextWebSocketFrame(JSONUtil.toJsonStr(msg)));
+    }
+
+    /**
+     * 推送消息给所有在线用户，可选择跳过某个用户
+     *
+     * @param wsBaseResp 推送消息体
+     * @param skipUid    需要跳过的用户uid List
+     */
+    @Override
+    public void sendMsgToAllOnline(WSBaseResp<?> wsBaseResp, List<Long> skipUid) {
+        // 遍历所有在线用户进行推送
+        ONLINE_WS_MAP.forEach((channel, ext) -> {
+            if (Objects.nonNull(skipUid) && skipUid.contains(ext.getUid())) {
+                return;
+            }
+            threadPoolTaskExecutor.execute(() -> sendMsg(channel, wsBaseResp));
+        });
     }
 
     /**

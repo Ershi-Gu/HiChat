@@ -14,8 +14,10 @@ import java.util.concurrent.TimeUnit;
 @Component
 public class UserLoginCache {
 
+    /**
+     * token必要刷新时间，达到此时间触发刷新
+     */
     public static final int REMAINING_EXPIRE_TIME_SECONDS = 86400;
-
     /**
      * 用户token过期时间
      */

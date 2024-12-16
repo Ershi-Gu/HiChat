@@ -1,11 +1,16 @@
 package com.ershi.hichat.common.user.service.imp;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.util.StrUtil;
+import com.ershi.hichat.common.common.event.UserBlackEvent;
 import com.ershi.hichat.common.common.event.UserRegisterEvent;
+import com.ershi.hichat.common.common.exception.BusinessException;
 import com.ershi.hichat.common.common.utils.AssertUtil;
 import com.ershi.hichat.common.common.utils.RequestHolder;
+import com.ershi.hichat.common.user.dao.BlackDao;
 import com.ershi.hichat.common.user.dao.UserBackpackDao;
 import com.ershi.hichat.common.user.dao.UserDao;
+import com.ershi.hichat.common.user.domain.entity.Black;
 import com.ershi.hichat.common.user.domain.entity.ItemConfig;
 import com.ershi.hichat.common.user.domain.entity.User;
 import com.ershi.hichat.common.user.domain.entity.UserBackpack;
@@ -14,10 +19,12 @@ import com.ershi.hichat.common.user.domain.enums.ItemTypeEnum;
 import com.ershi.hichat.common.user.domain.vo.response.user.BadgeResp;
 import com.ershi.hichat.common.user.domain.vo.response.user.UserInfoResp;
 import com.ershi.hichat.common.user.service.UserService;
+import com.ershi.hichat.common.user.service.adapter.BlackAdapter;
 import com.ershi.hichat.common.user.service.adapter.UserAdapter;
 import com.ershi.hichat.common.user.service.cache.ItemCache;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -31,6 +38,9 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     private UserDao userDao;
+
+    @Autowired
+    private BlackDao blackDao;
 
     @Autowired
     private UserBackpackDao userBackpackDao;
@@ -131,4 +141,58 @@ public class UserServiceImpl implements UserService {
         userDao.wearingBadges(RequestHolder.get().getUid(), badgeId);
     }
 
+    /**
+     * 拉黑用户
+     * @param uid
+     */
+    @Override
+    public void blackUser(Long uid) {
+        // 获取用户信息
+        User user = userDao.getById(uid);
+        AssertUtil.nonNull(user, "封禁目标用户不存在，请重新检查！");
+        // 构建black表需要的信息
+        Black blackUser = BlackAdapter.buildBlackUser(user);
+        // 更新black表
+        try {
+            blackDao.save(blackUser);
+        } catch (DuplicateKeyException e) {
+            throw new BusinessException("重复封禁用户");
+        }
+        // 发出封禁事件
+        applicationEventPublisher.publishEvent(new UserBlackEvent(this, user));
+
+    }
+
+    /**
+     * 封禁用户及ip
+     * @param uid
+     */
+    @Override
+    @Transactional
+    public void blackUserAndIp(Long uid) {
+        // 封禁用户
+        blackUser(uid);
+        // 获取用户ip
+        User user = userDao.getById(uid);
+        String updateIp = user.getIpInfo().getUpdateIp();
+        // 封禁用户最近登录ip
+        blackIp(updateIp);
+    }
+
+    /**
+     * 封禁ip
+     * @param ip
+     */
+    private void blackIp(String ip) {
+        if (StrUtil.isBlank(ip)) {
+            return;
+        }
+        // 构建black对象
+        Black blackIp = BlackAdapter.buildBlackIp(ip);
+        try {
+            blackDao.save(blackIp);
+        } catch (DuplicateKeyException e) {
+            throw new BusinessException("重复封禁ip");
+        }
+    }
 }

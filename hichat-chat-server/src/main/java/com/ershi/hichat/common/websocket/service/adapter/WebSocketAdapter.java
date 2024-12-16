@@ -1,10 +1,10 @@
 package com.ershi.hichat.common.websocket.service.adapter;
 
 import com.ershi.hichat.common.user.domain.entity.User;
-import com.ershi.hichat.common.user.domain.enums.WSRespTypeEnum;
-import com.ershi.hichat.common.user.domain.vo.response.ws.WSBaseResp;
-import com.ershi.hichat.common.user.domain.vo.response.ws.dataclass.WSLoginSuccess;
-import com.ershi.hichat.common.user.domain.vo.response.ws.dataclass.WSLoginUrl;
+import com.ershi.hichat.common.websocket.domain.enums.WSRespTypeEnum;
+import com.ershi.hichat.common.websocket.domain.vo.response.WSBaseResp;
+import com.ershi.hichat.common.websocket.domain.vo.response.dataclass.WSLoginSuccess;
+import com.ershi.hichat.common.websocket.domain.vo.response.dataclass.WSLoginUrl;
 import me.chanjar.weixin.mp.bean.result.WxMpQrCodeTicket;
 
 /**
@@ -30,11 +30,12 @@ public class WebSocketAdapter {
 
     /**
      * 构建token返回
+     *
      * @param user
      * @param token
-     * @return {@link WSBaseResp}<{@link ?}>
+     * @return {@link WSBaseResp}<{@link WSLoginSuccess}>
      */
-    public static WSBaseResp<?> buildTokenResp(User user, String token) {
+    public static WSBaseResp<WSLoginSuccess> buildTokenResp(User user, String token, Integer rule) {
         WSBaseResp<WSLoginSuccess> wsLoginSuccessResp = new WSBaseResp<>();
         wsLoginSuccessResp.setType(WSRespTypeEnum.LOGIN_SUCCESS.getType());
         WSLoginSuccess build = WSLoginSuccess.builder()
@@ -42,6 +43,7 @@ public class WebSocketAdapter {
                 .avatar(user.getAvatar())
                 .name(user.getName())
                 .token(token)
+                .rule(rule)
                 .build();
         wsLoginSuccessResp.setData(build);
         return wsLoginSuccessResp;
@@ -49,6 +51,7 @@ public class WebSocketAdapter {
 
     /**
      * 构建等待授权通知返回
+     *
      * @return {@link WSBaseResp}<{@link ?}>
      */
     public static WSBaseResp<?> buildWaitAuthorizeResp() {
@@ -59,6 +62,7 @@ public class WebSocketAdapter {
 
     /**
      * 构建token失效返回
+     *
      * @return {@link WSBaseResp}<{@link ?}>
      */
     public static WSBaseResp<?> buildInvalidTokenResp() {

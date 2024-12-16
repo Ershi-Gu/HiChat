@@ -1,6 +1,7 @@
 package com.ershi.hichat.common.user.dao;
 
 import com.ershi.hichat.common.user.domain.entity.User;
+import com.ershi.hichat.common.user.domain.enums.UserStatusEnum;
 import com.ershi.hichat.common.user.mapper.UserMapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.stereotype.Service;
@@ -55,6 +56,17 @@ public class UserDao extends ServiceImpl<UserMapper, User> {
         lambdaUpdate()
                 .eq(User::getId, uid)
                 .set(User::getItemId, badgeId)
+                .update();
+    }
+
+    /**
+     * 更新用户状态为封禁
+     * @param uid
+     */
+    public void invalidUid(Long uid) {
+        lambdaUpdate()
+                .eq(User::getId, uid)
+                .set(User::getStatus, UserStatusEnum.BAN.getType())
                 .update();
     }
 }

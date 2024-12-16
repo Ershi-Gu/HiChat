@@ -21,6 +21,7 @@ import java.io.IOException;
 public enum HttpErrorEnum implements ErrorEnum {
 
     ACCESS_DENIED(401, "登录失败，请重新登录"),
+    USER_FORBIDDEN(403, "您已被封禁！请联系管理员")
     ;
 
     private final Integer httpCode;

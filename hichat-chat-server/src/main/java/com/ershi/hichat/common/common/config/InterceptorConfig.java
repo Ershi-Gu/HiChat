@@ -1,5 +1,6 @@
 package com.ershi.hichat.common.common.config;
 
+import com.ershi.hichat.common.common.interceptor.BlackInterceptor;
 import com.ershi.hichat.common.common.interceptor.CollectorInterceptor;
 import com.ershi.hichat.common.common.interceptor.TokenInterceptor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,15 +23,23 @@ public class InterceptorConfig implements WebMvcConfigurer {
     @Autowired
     private TokenInterceptor tokenInterceptor;
 
+    @Autowired
+    private BlackInterceptor blackInterceptor;
+
     /**
      * 添加拦截器
      * @param registry
      */
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
+        // 鉴权拦截器
         registry.addInterceptor(tokenInterceptor)
                 .addPathPatterns("/capi/**");
+        // 信息收集拦截器
         registry.addInterceptor(collectorInterceptor)
+                .addPathPatterns("/capi/**");
+        // 黑名单拦截器
+        registry.addInterceptor(blackInterceptor)
                 .addPathPatterns("/capi/**");
     }
 }
