@@ -2,7 +2,7 @@ package com.ershi.hichat.common.websocket.handler;
 
 import cn.hutool.extra.spring.SpringUtil;
 import cn.hutool.json.JSONUtil;
-import com.ershi.hichat.common.user.domain.enums.WSReqTypeEnum;
+import com.ershi.hichat.common.websocket.domain.enums.WSReqTypeEnum;
 import com.ershi.hichat.common.websocket.domain.vo.request.WSBaseReq;
 import com.ershi.hichat.common.websocket.service.WebSocketService;
 import com.ershi.hichat.common.websocket.utils.NettyUtil;

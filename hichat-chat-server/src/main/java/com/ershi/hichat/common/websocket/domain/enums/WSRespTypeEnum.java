@@ -1,6 +1,6 @@
-package com.ershi.hichat.common.user.domain.enums;
+package com.ershi.hichat.common.websocket.domain.enums;
 
-import com.ershi.hichat.common.user.domain.vo.response.ws.dataclass.*;
+import com.ershi.hichat.common.websocket.domain.vo.response.dataclass.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -41,7 +41,7 @@ public enum WSRespTypeEnum {
     private final String desc;
     /**
      * 推送的数据，不同的消息类型有不同的数据格式
-     * @see com.ershi.hichat.common.user.domain.vo.response.ws.dataclass
+     * @see com.ershi.hichat.common.websocket.domain.vo.response.dataclass
      */
     private final Class dataClass;
 

@@ -1,4 +1,4 @@
-package com.ershi.hichat.common.user.domain.vo.response.ws.dataclass;
+package com.ershi.hichat.common.websocket.domain.vo.response.dataclass;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

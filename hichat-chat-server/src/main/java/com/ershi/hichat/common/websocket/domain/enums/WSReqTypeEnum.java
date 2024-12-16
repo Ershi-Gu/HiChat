@@ -1,4 +1,4 @@
-package com.ershi.hichat.common.user.domain.enums;
+package com.ershi.hichat.common.websocket.domain.enums;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
