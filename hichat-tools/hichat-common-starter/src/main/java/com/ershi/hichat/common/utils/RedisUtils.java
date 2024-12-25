@@ -1,4 +1,4 @@
-package com.ershi.hichat.utils;
+package com.ershi.hichat.common.utils;
 
 import cn.hutool.extra.spring.SpringUtil;
 import lombok.extern.slf4j.Slf4j;

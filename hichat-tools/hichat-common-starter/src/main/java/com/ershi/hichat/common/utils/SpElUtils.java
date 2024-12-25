@@ -1,4 +1,4 @@
-package com.ershi.hichat.utils;
+package com.ershi.hichat.common.utils;
 
 import org.springframework.core.DefaultParameterNameDiscoverer;
 import org.springframework.expression.EvaluationContext;
