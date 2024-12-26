@@ -1,7 +1,7 @@
 package com.ershi.hichat.common.user.service.cache;
 
 import com.ershi.hichat.common.common.constant.RedisKey;
-import com.ershi.hichat.utils.RedisUtils;
+import com.ershi.hichat.common.utils.RedisUtils;
 import org.springframework.stereotype.Component;
 
 import java.util.concurrent.TimeUnit;

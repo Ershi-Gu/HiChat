@@ -3,7 +3,7 @@ package com.ershi.hichat.common.common.aspect;
 import cn.hutool.core.util.StrUtil;
 import com.ershi.hichat.common.common.annotation.RedissonLock;
 import com.ershi.hichat.common.common.service.LockService;
-import com.ershi.hichat.utils.SpElUtils;
+import com.ershi.hichat.common.utils.SpElUtils;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
