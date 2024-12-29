@@ -1,8 +1,8 @@
 package com.ershi.hichat.common.user.service;
 
 import com.ershi.hichat.common.user.domain.entity.User;
-import com.ershi.hichat.common.user.domain.vo.response.user.BadgeResp;
-import com.ershi.hichat.common.user.domain.vo.response.user.UserInfoResp;
+import com.ershi.hichat.common.user.domain.vo.response.BadgeResp;
+import com.ershi.hichat.common.user.domain.vo.response.UserInfoResp;
 
 import java.util.List;
 

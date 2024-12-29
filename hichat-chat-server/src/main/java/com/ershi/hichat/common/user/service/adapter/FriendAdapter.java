@@ -1,7 +1,7 @@
 package com.ershi.hichat.common.user.service.adapter;
 
 import com.ershi.hichat.common.user.domain.entity.User;
-import com.ershi.hichat.common.user.domain.vo.response.user.FriendResp;
+import com.ershi.hichat.common.user.domain.vo.response.FriendResp;
 
 import java.util.List;
 import java.util.stream.Collectors;

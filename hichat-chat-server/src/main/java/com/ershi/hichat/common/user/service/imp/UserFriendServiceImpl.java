@@ -6,12 +6,11 @@ import com.ershi.hichat.common.user.dao.UserDao;
 import com.ershi.hichat.common.user.dao.UserFriendDao;
 import com.ershi.hichat.common.user.domain.entity.User;
 import com.ershi.hichat.common.user.domain.entity.UserFriend;
-import com.ershi.hichat.common.user.domain.vo.response.user.FriendResp;
+import com.ershi.hichat.common.user.domain.vo.response.FriendResp;
 import com.ershi.hichat.common.user.service.UserFriendService;
 import com.ershi.hichat.common.user.service.adapter.FriendAdapter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.util.CollectionUtils;
 
 import java.util.List;
 import java.util.stream.Collectors;

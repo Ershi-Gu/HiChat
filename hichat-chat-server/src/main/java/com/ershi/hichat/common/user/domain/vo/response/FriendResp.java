@@ -1,4 +1,4 @@
-package com.ershi.hichat.common.user.domain.vo.response.user;
+package com.ershi.hichat.common.user.domain.vo.response;
 
 import com.ershi.hichat.common.user.domain.enums.ChatActiveStatusEnum;
 import io.swagger.annotations.ApiModelProperty;

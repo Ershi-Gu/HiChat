@@ -1,4 +1,4 @@
-package com.ershi.hichat.common.user.domain.vo.response.user;
+package com.ershi.hichat.common.user.domain.vo.response;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;

@@ -2,9 +2,7 @@ package com.ershi.hichat.common.user.service;
 
 import com.ershi.hichat.common.domain.vo.request.CursorPageBaseReq;
 import com.ershi.hichat.common.domain.vo.response.CursorPageBaseResp;
-import com.ershi.hichat.common.user.domain.entity.UserFriend;
-import com.baomidou.mybatisplus.extension.service.IService;
-import com.ershi.hichat.common.user.domain.vo.response.user.FriendResp;
+import com.ershi.hichat.common.user.domain.vo.response.FriendResp;
 
 /**
  * <p>
