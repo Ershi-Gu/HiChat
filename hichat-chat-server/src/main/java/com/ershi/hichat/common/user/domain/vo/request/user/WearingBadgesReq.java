@@ -1,4 +1,4 @@
-package com.ershi.hichat.common.user.domain.vo.request;
+package com.ershi.hichat.common.user.domain.vo.request.user;
 
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
