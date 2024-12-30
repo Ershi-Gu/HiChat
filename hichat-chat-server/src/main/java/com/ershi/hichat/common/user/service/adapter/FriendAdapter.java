@@ -1,10 +1,20 @@
 package com.ershi.hichat.common.user.service.adapter;
 
 import com.ershi.hichat.common.user.domain.entity.User;
-import com.ershi.hichat.common.user.domain.vo.response.FriendResp;
+import com.ershi.hichat.common.user.domain.entity.UserApply;
+import com.ershi.hichat.common.user.domain.entity.UserFriend;
+import com.ershi.hichat.common.user.domain.vo.request.friend.FriendApplyReq;
+import com.ershi.hichat.common.user.domain.vo.request.friend.FriendCheckReq;
+import com.ershi.hichat.common.user.domain.vo.response.friend.FriendCheckResp;
+import com.ershi.hichat.common.user.domain.vo.response.friend.FriendResp;
 
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
+
+import static com.ershi.hichat.common.user.domain.enums.ApplyReadStatusEnum.*;
+import static com.ershi.hichat.common.user.domain.enums.ApplyStatusEnum.*;
+import static com.ershi.hichat.common.user.domain.enums.ApplyTypeEnum.*;
 
 /**
  * 好友相关模块适配器
@@ -27,5 +37,40 @@ public class FriendAdapter {
             resp.setActiveStatus(friendUser.getActiveStatus());
             return resp;
         }).collect(Collectors.toList());
+    }
+
+
+    /**
+     * 构建好友验证返回
+     * @param friendList
+     * @return {@link FriendCheckResp}
+     */
+    public static FriendCheckResp buildFriendCheckResp(List<UserFriend> friendList, FriendCheckReq friendCheckReq) {
+        Set<Long> friendUidSet = friendList.stream().map(UserFriend::getFriendUid).collect(Collectors.toSet());
+        List<FriendCheckResp.FriendCheck> friendCheckList = friendCheckReq.getUidList().stream()
+                .map(friendUid -> {
+                    FriendCheckResp.FriendCheck friendCheck = new FriendCheckResp.FriendCheck();
+                    friendCheck.setUid(friendUid);
+                    friendCheck.setIsFriend(friendUidSet.contains(friendUid));
+                    return friendCheck;
+                }).collect(Collectors.toList());
+        return FriendCheckResp.builder().checkedList(friendCheckList).build();
+    }
+
+    /**
+     * 构建用户申请信息
+     * @param uid
+     * @param request
+     * @return {@link UserApply}
+     */
+    public static UserApply buildFriendApply(Long uid, FriendApplyReq friendApplyReq) {
+        UserApply userApplyNew = new UserApply();
+        userApplyNew.setUid(uid);
+        userApplyNew.setMsg(friendApplyReq.getMsg());
+        userApplyNew.setType(ADD_FRIEND.getType());
+        userApplyNew.setTargetId(friendApplyReq.getTargetUid());
+        userApplyNew.setStatus(WAIT_APPROVAL.getStatus());
+        userApplyNew.setReadStatus(UNREAD.getStatus());
+        return userApplyNew;
     }
 }

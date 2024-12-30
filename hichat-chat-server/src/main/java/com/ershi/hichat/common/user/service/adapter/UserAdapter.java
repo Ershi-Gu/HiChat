@@ -6,8 +6,8 @@ import com.ershi.hichat.common.user.domain.entity.ItemConfig;
 import com.ershi.hichat.common.user.domain.entity.User;
 import com.ershi.hichat.common.user.domain.entity.UserBackpack;
 import com.ershi.hichat.common.user.domain.enums.UseStatusEnum;
-import com.ershi.hichat.common.user.domain.vo.response.BadgeResp;
-import com.ershi.hichat.common.user.domain.vo.response.UserInfoResp;
+import com.ershi.hichat.common.user.domain.vo.response.user.BadgeResp;
+import com.ershi.hichat.common.user.domain.vo.response.user.UserInfoResp;
 import me.chanjar.weixin.common.bean.WxOAuth2UserInfo;
 
 import java.util.Collections;
