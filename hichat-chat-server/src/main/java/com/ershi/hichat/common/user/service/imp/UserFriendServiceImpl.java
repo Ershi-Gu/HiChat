@@ -2,6 +2,9 @@ package com.ershi.hichat.common.user.service.imp;
 
 import cn.hutool.core.collection.CollectionUtil;
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.ershi.hichat.common.chat.domain.entity.RoomFriend;
+import com.ershi.hichat.common.chat.service.RoomFriendService;
+import com.ershi.hichat.common.chat.service.RoomService;
 import com.ershi.hichat.common.common.annotation.RedissonLock;
 import com.ershi.hichat.common.common.event.UserApplyEvent;
 import com.ershi.hichat.common.common.utils.AssertUtil;
@@ -59,6 +62,9 @@ public class UserFriendServiceImpl implements UserFriendService {
 
     @Autowired
     private ApplicationEventPublisher applicationEventPublisher;
+
+    @Autowired
+    private RoomFriendService roomFriendService;
 
     /**
      * 批量检查目标对象是否是自己好友
@@ -143,12 +149,14 @@ public class UserFriendServiceImpl implements UserFriendService {
         UserApply userApply = userApplyDao.getById(friendApproveReq.getApplyId());
         AssertUtil.isNotEmpty(userApply, "不存在申请记录");
         AssertUtil.equal(userApply.getTargetId(), uid, "不存在申请记录");
-        AssertUtil.equal(userApply.getStatus(), WAIT_APPROVAL.getStatus(), "已同意好友申请");
-        //同意申请
+        AssertUtil.equal(userApply.getStatus(), WAIT_APPROVAL.getStatus(), "已同意过好友申请");
+        // 同意申请
         userApplyDao.agree(friendApproveReq.getApplyId());
-        //创建双方好友关系
+        // 创建双方好友关系
         createFriend(uid, userApply.getUid());
-        // todo 1.创建一个聊天房间 2.发送一条同意消息。。我们已经是好友了，开始聊天吧
+        // 创建一个聊天房间
+        RoomFriend roomFriend = roomFriendService.createFriendRoom(Arrays.asList(uid, userApply.getUid()));
+        // todo 发送一条同意消息。。我们已经是好友了，开始聊天吧
     }
 
     /**
@@ -193,7 +201,8 @@ public class UserFriendServiceImpl implements UserFriendService {
         // 删除好友数据
         List<Long> friendRecordIds = userFriends.stream().map(UserFriend::getId).collect(Collectors.toList());
         userFriendDao.removeByIds(friendRecordIds);
-        // todo 禁用房间
+        // 禁用房间
+        roomFriendService.disableFriendRoom(Arrays.asList(uid, targetUid));
     }
 
     /**
