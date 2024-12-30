@@ -1,11 +1,14 @@
 package com.ershi.hichat.common.user.service.imp;
 
 import cn.hutool.core.collection.CollectionUtil;
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.ershi.hichat.common.common.annotation.RedissonLock;
 import com.ershi.hichat.common.common.event.UserApplyEvent;
 import com.ershi.hichat.common.common.utils.AssertUtil;
 import com.ershi.hichat.common.domain.vo.request.CursorPageBaseReq;
+import com.ershi.hichat.common.domain.vo.request.PageBaseReq;
 import com.ershi.hichat.common.domain.vo.response.CursorPageBaseResp;
+import com.ershi.hichat.common.domain.vo.response.PageBaseResp;
 import com.ershi.hichat.common.user.dao.UserApplyDao;
 import com.ershi.hichat.common.user.dao.UserDao;
 import com.ershi.hichat.common.user.dao.UserFriendDao;
@@ -15,6 +18,7 @@ import com.ershi.hichat.common.user.domain.entity.UserFriend;
 import com.ershi.hichat.common.user.domain.vo.request.friend.FriendApplyReq;
 import com.ershi.hichat.common.user.domain.vo.request.friend.FriendApproveReq;
 import com.ershi.hichat.common.user.domain.vo.request.friend.FriendCheckReq;
+import com.ershi.hichat.common.user.domain.vo.response.friend.FriendApplyResp;
 import com.ershi.hichat.common.user.domain.vo.response.friend.FriendCheckResp;
 import com.ershi.hichat.common.user.domain.vo.response.friend.FriendResp;
 import com.ershi.hichat.common.user.domain.vo.response.friend.FriendUnreadResp;
@@ -67,8 +71,7 @@ public class UserFriendServiceImpl implements UserFriendService {
         // 查询目标列表中是否包含好友
         List<UserFriend> friendList = userFriendDao.getFriendsInTargetList(uid, friendCheckReq.getUidList());
         // 构建好友验证返回
-        FriendCheckResp friendCheckResp = FriendAdapter.buildFriendCheckResp(friendList, friendCheckReq);
-        return friendCheckResp;
+        return FriendAdapter.buildFriendCheckResp(friendList, friendCheckReq);
     }
 
 
@@ -181,14 +184,46 @@ public class UserFriendServiceImpl implements UserFriendService {
      */
     @Override
     public void deleteFriend(Long uid, Long targetUid) {
-        List<UserFriend> userFriends = userFriendDao.getUserFriend(uid, friendUid);
+        // 获取双向好友关系数据
+        List<UserFriend> userFriends = userFriendDao.getUserFriend(uid, targetUid);
         if (CollectionUtil.isEmpty(userFriends)) {
-            log.info("没有好友关系：{},{}", uid, friendUid);
+            log.info("没有好友关系：{},{}", uid, targetUid);
             return;
         }
+        // 删除好友数据
         List<Long> friendRecordIds = userFriends.stream().map(UserFriend::getId).collect(Collectors.toList());
         userFriendDao.removeByIds(friendRecordIds);
-        //禁用房间
-        roomService.disableFriendRoom(Arrays.asList(uid, friendUid));
+        // todo 禁用房间
+    }
+
+    /**
+     * 分页查询好友申请信息
+     *
+     * @param uid
+     * @param pageBaseReq
+     * @return {@link PageBaseResp}<{@link FriendApplyResp}>
+     */
+    @Override
+    public PageBaseResp<FriendApplyResp> pageApplyFriend(Long uid, PageBaseReq pageBaseReq) {
+        IPage<UserApply> userApplyIPage = userApplyDao.friendApplyPage(uid, pageBaseReq.plusPage());
+        if (CollectionUtil.isEmpty(userApplyIPage.getRecords())) {
+            return PageBaseResp.empty();
+        }
+        //将这些申请列表设为已读
+        readApples(uid, userApplyIPage);
+        //返回消息
+        return PageBaseResp.init(userApplyIPage, FriendAdapter.buildFriendApplyList(userApplyIPage.getRecords()));
+    }
+
+    /**
+     * 已读消息
+     * @param uid
+     * @param userApplyIPage
+     */
+    private void readApples(Long uid, IPage<UserApply> userApplyIPage) {
+        List<Long> applyIds = userApplyIPage.getRecords()
+                .stream().map(UserApply::getId)
+                .collect(Collectors.toList());
+        userApplyDao.readApples(uid, applyIds);
     }
 }

@@ -1,10 +1,13 @@
 package com.ershi.hichat.common.user.service;
 
 import com.ershi.hichat.common.domain.vo.request.CursorPageBaseReq;
+import com.ershi.hichat.common.domain.vo.request.PageBaseReq;
 import com.ershi.hichat.common.domain.vo.response.CursorPageBaseResp;
+import com.ershi.hichat.common.domain.vo.response.PageBaseResp;
 import com.ershi.hichat.common.user.domain.vo.request.friend.FriendApplyReq;
 import com.ershi.hichat.common.user.domain.vo.request.friend.FriendApproveReq;
 import com.ershi.hichat.common.user.domain.vo.request.friend.FriendCheckReq;
+import com.ershi.hichat.common.user.domain.vo.response.friend.FriendApplyResp;
 import com.ershi.hichat.common.user.domain.vo.response.friend.FriendCheckResp;
 import com.ershi.hichat.common.user.domain.vo.response.friend.FriendResp;
 import com.ershi.hichat.common.user.domain.vo.response.friend.FriendUnreadResp;
@@ -30,4 +33,6 @@ public interface UserFriendService {
     FriendUnreadResp unread(Long uid);
 
     void deleteFriend(Long uid, Long targetUid);
+
+    PageBaseResp<FriendApplyResp> pageApplyFriend(Long uid, PageBaseReq pageBaseReq);
 }

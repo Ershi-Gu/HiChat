@@ -5,6 +5,7 @@ import com.ershi.hichat.common.user.domain.entity.UserApply;
 import com.ershi.hichat.common.user.domain.entity.UserFriend;
 import com.ershi.hichat.common.user.domain.vo.request.friend.FriendApplyReq;
 import com.ershi.hichat.common.user.domain.vo.request.friend.FriendCheckReq;
+import com.ershi.hichat.common.user.domain.vo.response.friend.FriendApplyResp;
 import com.ershi.hichat.common.user.domain.vo.response.friend.FriendCheckResp;
 import com.ershi.hichat.common.user.domain.vo.response.friend.FriendResp;
 
@@ -58,9 +59,10 @@ public class FriendAdapter {
     }
 
     /**
-     * 构建用户申请信息
+     * 构建好友信息
+     *
      * @param uid
-     * @param request
+     * @param friendApplyReq
      * @return {@link UserApply}
      */
     public static UserApply buildFriendApply(Long uid, FriendApplyReq friendApplyReq) {
@@ -72,5 +74,22 @@ public class FriendAdapter {
         userApplyNew.setStatus(WAIT_APPROVAL.getStatus());
         userApplyNew.setReadStatus(UNREAD.getStatus());
         return userApplyNew;
+    }
+
+    /**
+     * 构建好友信息列表返回数据
+     * @param records
+     * @return {@link List}<{@link FriendApplyResp}>
+     */
+    public static List<FriendApplyResp> buildFriendApplyList(List<UserApply> records) {
+        return records.stream().map(userApply -> {
+            FriendApplyResp friendApplyResp = new FriendApplyResp();
+            friendApplyResp.setUid(userApply.getUid());
+            friendApplyResp.setType(userApply.getType());
+            friendApplyResp.setApplyId(userApply.getId());
+            friendApplyResp.setMsg(userApply.getMsg());
+            friendApplyResp.setStatus(userApply.getStatus());
+            return friendApplyResp;
+        }).collect(Collectors.toList());
     }
 }
