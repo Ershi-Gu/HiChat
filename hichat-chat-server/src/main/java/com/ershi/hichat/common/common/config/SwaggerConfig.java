@@ -32,7 +32,8 @@ import java.util.List;
 
 
 /**
- * Swagger 配置类
+ * Swagger 配置类 <br>
+ * 接口地址：项目 ip:port/doc.html
  * @author Ershi
  * @date 2024/12/03
  */
