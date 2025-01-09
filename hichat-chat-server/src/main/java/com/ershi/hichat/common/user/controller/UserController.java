@@ -5,9 +5,11 @@ import com.ershi.hichat.common.common.annotation.AuthCheck;
 import com.ershi.hichat.common.common.domain.vo.ApiResult;
 import com.ershi.hichat.common.common.utils.RequestHolder;
 import com.ershi.hichat.common.user.domain.enums.RoleEnum;
+import com.ershi.hichat.common.user.domain.vo.request.user.AggregateUserInfoReq;
 import com.ershi.hichat.common.user.domain.vo.request.user.BlackReq;
 import com.ershi.hichat.common.user.domain.vo.request.user.ModifyNameReq;
 import com.ershi.hichat.common.user.domain.vo.request.user.WearingBadgesReq;
+import com.ershi.hichat.common.user.domain.vo.response.user.AggregateUserInfoResp;
 import com.ershi.hichat.common.user.domain.vo.response.user.BadgeResp;
 import com.ershi.hichat.common.user.domain.vo.response.user.UserInfoResp;
 import com.ershi.hichat.common.user.service.UserService;
@@ -75,6 +77,12 @@ public class UserController {
     public ApiResult<Void> blackUserAndIp(@Valid @RequestBody BlackReq blackReq) {
         userService.blackUserAndIp(blackReq.getUid());
         return ApiResult.success();
+    }
+
+    @GetMapping("/public/aggregate/userInfo/batch")
+    @ApiOperation("聚合获取需要刷新的用户信息")
+    public ApiResult<List<AggregateUserInfoResp>> getAggregateUserInfo(@Valid @RequestBody AggregateUserInfoReq aggregateUserInfoReq) {
+        return ApiResult.success(userService.getAggregateUserInfo(aggregateUserInfoReq));
     }
 
 }

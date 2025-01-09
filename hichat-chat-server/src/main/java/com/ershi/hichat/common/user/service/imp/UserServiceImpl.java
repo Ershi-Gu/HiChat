@@ -16,20 +16,25 @@ import com.ershi.hichat.common.user.domain.entity.User;
 import com.ershi.hichat.common.user.domain.entity.UserBackpack;
 import com.ershi.hichat.common.user.domain.enums.ItemEnum;
 import com.ershi.hichat.common.user.domain.enums.ItemTypeEnum;
+import com.ershi.hichat.common.user.domain.vo.request.user.AggregateUserInfoReq;
+import com.ershi.hichat.common.user.domain.vo.response.user.AggregateUserInfoResp;
 import com.ershi.hichat.common.user.domain.vo.response.user.BadgeResp;
 import com.ershi.hichat.common.user.domain.vo.response.user.UserInfoResp;
 import com.ershi.hichat.common.user.service.UserService;
 import com.ershi.hichat.common.user.service.adapter.BlackAdapter;
 import com.ershi.hichat.common.user.service.adapter.UserAdapter;
 import com.ershi.hichat.common.user.service.cache.ItemCache;
+import com.ershi.hichat.common.user.service.cache.UserInfoCache;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 
@@ -47,6 +52,9 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     private ItemCache itemCache;
+
+    @Autowired
+    private UserInfoCache userInfoCache;
 
     @Autowired
     private ApplicationEventPublisher applicationEventPublisher;
@@ -194,5 +202,38 @@ public class UserServiceImpl implements UserService {
         } catch (DuplicateKeyException e) {
             throw new BusinessException("重复封禁ip");
         }
+    }
+
+
+    /**
+     * 聚合获取需要刷新的用户信息
+     * @param aggregateUserInfoReq
+     * @return {@link List }<{@link AggregateUserInfoResp }>
+     */
+    @Override
+    public List<AggregateUserInfoResp> getAggregateUserInfo(AggregateUserInfoReq aggregateUserInfoReq) {
+        // 获取需要刷新数据的用户id列表
+        List<Long> uidList = getNeedSyncUidList(aggregateUserInfoReq.getReqList());
+        // 加载需要刷新的用户信息
+        // 返回需要刷新的用户信息列表
+        return null;
+    }
+
+    /**
+     * 获取需要刷新的用户id列表
+     * @param reqList
+     * @return {@link List }<{@link Long }>
+     */
+    private List<Long> getNeedSyncUidList(List<AggregateUserInfoReq.infoReq> reqList) {
+        List<Long> needSyncUidList = new ArrayList<>();
+        List<Long> userModifyTimeList = userInfoCache.getUserLastModifyTime(reqList.stream().map(AggregateUserInfoReq.infoReq::getUid).collect(Collectors.toList()));
+        for (int i = 0; i < reqList.size(); i++) {
+            AggregateUserInfoReq.infoReq infoReq = reqList.get(i);
+            Long modifyTime = userModifyTimeList.get(i);
+            if (Objects.isNull(infoReq.getLastModifyTime()) || (Objects.nonNull(modifyTime) && modifyTime > infoReq.getLastModifyTime())) {
+                needSyncUidList.add(infoReq.getUid());
+            }
+        }
+        return needSyncUidList;
     }
 }

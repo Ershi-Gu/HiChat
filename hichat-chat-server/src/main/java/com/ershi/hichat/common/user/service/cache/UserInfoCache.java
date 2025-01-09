@@ -1,9 +1,11 @@
 package com.ershi.hichat.common.user.service.cache;
 
+import com.ershi.hichat.common.common.constant.RedisKey;
 import com.ershi.hichat.common.user.dao.BlackDao;
 import com.ershi.hichat.common.user.dao.UserRoleDao;
 import com.ershi.hichat.common.user.domain.entity.Black;
 import com.ershi.hichat.common.user.domain.entity.UserRole;
+import com.ershi.hichat.common.utils.RedisUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
@@ -58,5 +60,16 @@ public class UserInfoCache {
             result.put(entry.getKey(), entry.getValue().stream().map(Black::getTarget).collect(Collectors.toSet()));
         }
         return result;
+    }
+
+    /**
+     * 批量从缓存获取用户信息最后一次更新时间
+     *
+     * @param uidList
+     * @return {@link List }<{@link Long }>
+     */
+    public List<Long> getUserLastModifyTime(List<Long> uidList) {
+        List<String> keys = uidList.stream().map(uid -> RedisKey.getKey(RedisKey.USER_LAST_MODIFY_STRING, uid)).collect(Collectors.toList());
+        return RedisUtils.mget(keys, Long.class);
     }
 }

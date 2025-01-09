@@ -19,6 +19,11 @@ public class RedisKey {
     public static final String USER_TOKEN_STRING = "userToken:uid_%d";
 
     /**
+     * 用户的信息最後一次更新时间
+     */
+    public static final String USER_LAST_MODIFY_STRING = "userLastModifyTime:uid_%d";
+
+    /**
      * 获取key
      *
      * @param key 带有模板字符串的key
