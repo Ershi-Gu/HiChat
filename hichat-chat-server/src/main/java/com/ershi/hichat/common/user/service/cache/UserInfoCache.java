@@ -1,9 +1,12 @@
 package com.ershi.hichat.common.user.service.cache;
 
+import com.ershi.hichat.common.cache.AbstractRedisStringCache;
 import com.ershi.hichat.common.common.constant.RedisKey;
 import com.ershi.hichat.common.user.dao.BlackDao;
+import com.ershi.hichat.common.user.dao.UserDao;
 import com.ershi.hichat.common.user.dao.UserRoleDao;
 import com.ershi.hichat.common.user.domain.entity.Black;
+import com.ershi.hichat.common.user.domain.entity.User;
 import com.ershi.hichat.common.user.domain.entity.UserRole;
 import com.ershi.hichat.common.utils.RedisUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,25 +17,54 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static com.ershi.hichat.common.common.constant.SpringCacheConstant.USER_CACHE_NAME;
 
 /**
- * 用户信息缓存
+ * 用户信息缓存 - 实现批量缓存框架[Uid, User]
  *
  * @author Ershi
  * @date 2024/12/15
  */
 @Service
-// todo 修改为Redis存储框架
-public class UserInfoCache {
+public class UserInfoCache extends AbstractRedisStringCache<Long, User> {
 
     @Autowired
     private UserRoleDao userRoleDao;
 
     @Autowired
     private BlackDao blackDao;
+
+    @Autowired
+    private UserDao userDao;
+
+    /**
+     * 用户信息缓存过期时间
+     */
+    public static final long USER_INFO_EXPIRE_SECONDS = 5 * 60L;
+
+    @Override
+    protected String getKey(Long uid) {
+        return RedisKey.getKey(RedisKey.USER_INFO_STRING, uid);
+    }
+
+    @Override
+    protected Long getExpireSeconds() {
+        return USER_INFO_EXPIRE_SECONDS;
+    }
+
+    /**
+     * @param uidList
+     * @return {@link Map }<{@link Long }, {@link User }> map[uid-User]
+     */
+    @Override
+    protected Map<Long, User> load(List<Long> uidList) {
+        // 从数据库加载用户信息
+        List<User> loadUserInfoList = userDao.listByIds(uidList);
+        return loadUserInfoList.stream().collect(Collectors.toMap(User::getId, Function.identity()));
+    }
 
     /**
      * 获取用户身份id集合set

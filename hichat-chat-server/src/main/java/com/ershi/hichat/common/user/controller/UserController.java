@@ -79,7 +79,7 @@ public class UserController {
         return ApiResult.success();
     }
 
-    @GetMapping("/public/aggregate/userInfo/batch")
+    @PostMapping("/public/aggregate/userInfo/batch")
     @ApiOperation("聚合获取需要刷新的用户信息")
     public ApiResult<List<AggregateUserInfoResp>> getAggregateUserInfo(@Valid @RequestBody AggregateUserInfoReq aggregateUserInfoReq) {
         return ApiResult.success(userService.getAggregateUserInfo(aggregateUserInfoReq));

@@ -71,12 +71,27 @@ public class UserBackpackDao extends ServiceImpl<UserBackpackMapper, UserBackpac
      * 查询用户拥有的某类待使用的所有物品
      *
      * @param uid     用户id
-     * @param itemIds 物品id
+     * @param itemIds 物品id列表
      * @return {@link List}<{@link UserBackpack}> 拥有的所有待使用的该物品
      */
-    public List<UserBackpack> getByItemsId(Long uid, List<Long> itemIds) {
+    public List<UserBackpack> getByItemsIds(Long uid, List<Long> itemIds) {
         return lambdaQuery()
                 .eq(UserBackpack::getUid, uid)
+                .in(UserBackpack::getItemId, itemIds)
+                .eq(UserBackpack::getStatus, UseStatusEnum.TO_BE_USED.getStatus())
+                .list();
+    }
+
+    /**
+     * 查询用户拥有的某类待使用的所有物品
+     *
+     * @param uid 用户uid列表
+     * @param itemIds 物品id列表
+     * @return {@link List}<{@link UserBackpack}> 拥有的所有待使用的该物品
+     */
+    public List<UserBackpack> getByItemsIds(List<Long> uid, List<Long> itemIds) {
+        return lambdaQuery()
+                .in(UserBackpack::getUid, uid)
                 .in(UserBackpack::getItemId, itemIds)
                 .eq(UserBackpack::getStatus, UseStatusEnum.TO_BE_USED.getStatus())
                 .list();

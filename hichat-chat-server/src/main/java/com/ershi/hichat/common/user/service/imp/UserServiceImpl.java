@@ -23,6 +23,7 @@ import com.ershi.hichat.common.user.domain.vo.response.user.UserInfoResp;
 import com.ershi.hichat.common.user.service.UserService;
 import com.ershi.hichat.common.user.service.adapter.BlackAdapter;
 import com.ershi.hichat.common.user.service.adapter.UserAdapter;
+import com.ershi.hichat.common.user.service.cache.AggregateUserInfoCache;
 import com.ershi.hichat.common.user.service.cache.ItemCache;
 import com.ershi.hichat.common.user.service.cache.UserInfoCache;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,10 +32,7 @@ import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 
 
@@ -58,6 +56,9 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     private ApplicationEventPublisher applicationEventPublisher;
+
+    @Autowired
+    private AggregateUserInfoCache aggregateUserInfoCache;
 
     /**
      * 注册
@@ -126,7 +127,7 @@ public class UserServiceImpl implements UserService {
             return Collections.emptyList();
         }
         // 查询用户拥有的徽章
-        List<UserBackpack> backpacks = userBackpackDao.getByItemsId(uid,
+        List<UserBackpack> backpacks = userBackpackDao.getByItemsIds(uid,
                 itemConfigs.stream().map(ItemConfig::getId).collect(Collectors.toList()));
         //查询用户当前佩戴的标签
         User user = userDao.getById(uid);
@@ -204,9 +205,8 @@ public class UserServiceImpl implements UserService {
         }
     }
 
-
     /**
-     * 聚合获取需要刷新的用户信息
+     * 获取需要刷新的聚合用户信息
      * @param aggregateUserInfoReq
      * @return {@link List }<{@link AggregateUserInfoResp }>
      */
@@ -214,9 +214,16 @@ public class UserServiceImpl implements UserService {
     public List<AggregateUserInfoResp> getAggregateUserInfo(AggregateUserInfoReq aggregateUserInfoReq) {
         // 获取需要刷新数据的用户id列表
         List<Long> uidList = getNeedSyncUidList(aggregateUserInfoReq.getReqList());
-        // 加载需要刷新的用户信息
-        // 返回需要刷新的用户信息列表
-        return null;
+        // 加载需要刷新的聚合用户信息
+        Map<Long, AggregateUserInfoResp> aggregateUserInfoMap = aggregateUserInfoCache.getBatch(uidList);
+        // 返回需要刷新的聚合用户信息列表
+        return aggregateUserInfoReq.getReqList()
+                .stream()
+                // 将不需要刷新的用户needRefresh设置为false
+                .map(req -> aggregateUserInfoMap.containsKey(req.getUid()) ? aggregateUserInfoMap.get(req.getUid())
+                        : AggregateUserInfoResp.skip(req.getUid()))
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList());
     }
 
     /**
@@ -226,11 +233,18 @@ public class UserServiceImpl implements UserService {
      */
     private List<Long> getNeedSyncUidList(List<AggregateUserInfoReq.infoReq> reqList) {
         List<Long> needSyncUidList = new ArrayList<>();
-        List<Long> userModifyTimeList = userInfoCache.getUserLastModifyTime(reqList.stream().map(AggregateUserInfoReq.infoReq::getUid).collect(Collectors.toList()));
+        // 获取缓存中对应uid的用户信息lastModifyTime
+        List<Long> userModifyTimeListFromRedis = userInfoCache.getUserLastModifyTime(reqList.stream().map(AggregateUserInfoReq.infoReq::getUid).collect(Collectors.toList()));
         for (int i = 0; i < reqList.size(); i++) {
+            // 遍历对比前端和后端的lastModifyTime
             AggregateUserInfoReq.infoReq infoReq = reqList.get(i);
-            Long modifyTime = userModifyTimeList.get(i);
-            if (Objects.isNull(infoReq.getLastModifyTime()) || (Objects.nonNull(modifyTime) && modifyTime > infoReq.getLastModifyTime())) {
+            Long modifyTimeFromRedis = userModifyTimeListFromRedis.get(i);
+            /**
+             * 下面情况需要进行懒加载
+             * 1. 前端未存储lastModifyTime -> 说明前端没有资源
+             * 2. 前端存储的lastModifyTime < 后端的lastModifyTime -> 说明前端资源过期
+             */
+            if (Objects.isNull(infoReq.getLastModifyTime()) || (Objects.nonNull(modifyTimeFromRedis) && modifyTimeFromRedis > infoReq.getLastModifyTime())) {
                 needSyncUidList.add(infoReq.getUid());
             }
         }

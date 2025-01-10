@@ -24,6 +24,16 @@ public class RedisKey {
     public static final String USER_LAST_MODIFY_STRING = "userLastModifyTime:uid_%d";
 
     /**
+     * 聚合用户信息
+     */
+    public static final String AGGREGATE_USER_INFO_STRING = "userAggregate:uid_%d";
+
+    /**
+     * 用户信息
+     */
+    public static final String USER_INFO_STRING = "userInfo:uid_%d";
+
+    /**
      * 获取key
      *
      * @param key 带有模板字符串的key
