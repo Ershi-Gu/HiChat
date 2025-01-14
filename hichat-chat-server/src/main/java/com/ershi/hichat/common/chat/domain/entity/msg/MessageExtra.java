@@ -27,7 +27,7 @@ import java.util.Map;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class MessageExtra implements Serializable {
 
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = -8389910228294638090L;
 
     /**
      * url跳转链接信息
@@ -36,7 +36,7 @@ public class MessageExtra implements Serializable {
     /**
      * 消息撤回详情
      */
-    private MsgRecall recall;
+    private MsgRecallDTO recall;
     /**
      * 艾特的uid
      */

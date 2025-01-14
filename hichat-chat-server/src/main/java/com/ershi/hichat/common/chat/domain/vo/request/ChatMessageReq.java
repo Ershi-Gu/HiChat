@@ -33,6 +33,6 @@ public class ChatMessageReq {
      */
     @ApiModelProperty("消息内容，类型不同传值不同")
     @NotNull
-    private BaseMsgDTO messageBody;
+    private Object messageBody;
 
 }

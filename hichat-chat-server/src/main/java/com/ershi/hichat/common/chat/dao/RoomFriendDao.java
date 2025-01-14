@@ -18,6 +18,17 @@ import org.springframework.stereotype.Service;
 public class RoomFriendDao extends ServiceImpl<RoomFriendMapper, RoomFriend> {
 
     /**
+     * 通过roomId获取房间数据
+     * @param roomId
+     * @return {@link RoomFriend }
+     */
+    public RoomFriend getByRoomId(Long roomId) {
+        return lambdaQuery()
+                .eq(RoomFriend::getRoomId, roomId)
+                .one();
+    }
+
+    /**
      * 通过单聊房间唯一键获取房间数据
      * @param key
      * @return {@link RoomFriend}

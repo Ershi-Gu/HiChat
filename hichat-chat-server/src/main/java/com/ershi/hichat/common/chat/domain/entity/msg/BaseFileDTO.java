@@ -20,7 +20,8 @@ import java.io.Serializable;
 @AllArgsConstructor
 @NoArgsConstructor
 public class BaseFileDTO implements Serializable {
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = -3003466224804088047L;
+
     @ApiModelProperty("大小（字节）")
     @NotNull
     private Long size;

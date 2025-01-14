@@ -26,12 +26,22 @@ public class ChatMessageResp {
     @ApiModelProperty("消息详情")
     private MessageInfo messageInfo;
 
+    /**
+     * 发送用户信息
+     * @author Ershi
+     * @date 2025/01/14
+     */
     @Data
     public static class UserInfo {
         @ApiModelProperty("用户id")
         private Long uid;
     }
 
+    /**
+     * 返回消息详情
+     * @author Ershi
+     * @date 2025/01/14
+     */
     @Data
     public static class MessageInfo {
         @ApiModelProperty("消息id")
@@ -42,12 +52,20 @@ public class ChatMessageResp {
         private Date sendTime;
         @ApiModelProperty("消息类型 1正常文本 2.撤回消息")
         private Integer type;
-        @ApiModelProperty("消息内容不同的消息类型，内容体不同，见https://www.yuque.com/snab/mallcaht/rkb2uz5k1qqdmcmd")
+        /**
+         * @see com.ershi.hichat.common.chat.domain.entity.msg.type
+         */
+        @ApiModelProperty("消息内容不同的消息类型，内容体不同")
         private BaseMsgDTO messageBody;
         @ApiModelProperty("消息标记")
         private MessageMark messageMark;
     }
 
+    /**
+     * 消息标记
+     * @author Ershi
+     * @date 2025/01/14
+     */
     @Data
     public static class MessageMark {
         @ApiModelProperty("点赞数")

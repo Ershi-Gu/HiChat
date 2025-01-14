@@ -62,7 +62,7 @@ public class AssertUtil {
                 errorMsg.append(violation.getPropertyPath().toString()).append(":").append(violation.getMessage()).append(",");
             }
             //去掉最后一个逗号
-            throwException(SystemCommonErrorEnum.PARAM_VALID, errorMsg.toString().substring(0, errorMsg.length() - 1));
+            throwException(SystemCommonErrorEnum.PARAM_VALID, errorMsg.substring(0, errorMsg.length() - 1));
         }
     }
 
