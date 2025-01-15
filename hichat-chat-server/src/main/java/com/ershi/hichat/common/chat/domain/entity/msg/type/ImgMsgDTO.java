@@ -24,7 +24,7 @@ import java.io.Serializable;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ImgMsgDTO extends BaseFileDTO implements BaseMsgDTO, Serializable {
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 117224716038325871L;
 
     @ApiModelProperty("宽度（像素）")
     @NotNull

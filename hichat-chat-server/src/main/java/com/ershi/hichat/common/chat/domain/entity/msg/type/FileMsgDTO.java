@@ -21,7 +21,7 @@ import java.io.Serializable;
 @AllArgsConstructor
 @NoArgsConstructor
 public class FileMsgDTO extends BaseFileDTO implements BaseMsgDTO, Serializable {
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 7625826642147680870L;
 
     @ApiModelProperty("文件名（带后缀）")
     @NotBlank

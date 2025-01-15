@@ -11,20 +11,24 @@ import javax.validation.constraints.NotBlank;
 import java.io.Serializable;
 
 /**
- * emoji表情参数
+ * 文本消息参数
  * @author Ershi
- * @date 2025/01/13
+ * @date 2025/01/15
  */
 @Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class EmojisMsgDTO implements BaseMsgDTO, Serializable {
-    private static final long serialVersionUID = 8306969784765531308L;
+public class TextMsgDTO implements BaseMsgDTO, Serializable {
+    private static final long serialVersionUID = 3598080947382565713L;
 
-    @ApiModelProperty("下载地址")
+    @ApiModelProperty("文本消息内容")
     @NotBlank
-    private String url;
+    private String content;
+
+    @ApiModelProperty("回复的消息id，没有就不传")
+    private Long replyMsgId;
+
+    @ApiModelProperty("艾特的uid，如果是全体艾特传 0")
+    private Long[] atUidList;
 }
-
-

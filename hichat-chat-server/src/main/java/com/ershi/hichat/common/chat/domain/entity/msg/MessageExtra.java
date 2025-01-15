@@ -15,7 +15,7 @@ import java.util.Map;
 
 
 /**
- * 消息扩展属性
+ * 消息扩展属性-用于传递msgTypeDTO参数到到Message实体类，保存消息额外信息
  * @author Ershi
  * @date 2025/01/13
  */
@@ -24,7 +24,7 @@ import java.util.Map;
 @AllArgsConstructor
 @NoArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
-@JsonInclude(JsonInclude.Include.NON_NULL)
+@JsonInclude(JsonInclude.Include.NON_NULL) // 忽略值为null的参数
 public class MessageExtra implements Serializable {
 
     private static final long serialVersionUID = -8389910228294638090L;
