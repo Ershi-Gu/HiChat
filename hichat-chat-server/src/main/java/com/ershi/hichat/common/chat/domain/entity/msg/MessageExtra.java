@@ -38,9 +38,9 @@ public class MessageExtra implements Serializable {
      */
     private MsgRecallDTO recall;
     /**
-     * 艾特的uid
+     * 文本消息
      */
-    private List<Long> atUidList;
+    private TextMsgDTO textMsg;
     /**
      * 文件消息
      */

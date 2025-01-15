@@ -3,7 +3,6 @@ package com.ershi.hichat.common.chat.service.strategy.msg.handler;
 import cn.hutool.core.bean.BeanUtil;
 import com.ershi.hichat.common.chat.dao.MessageDao;
 import com.ershi.hichat.common.chat.domain.entity.Message;
-import com.ershi.hichat.common.chat.domain.entity.msg.BaseMsgDTO;
 import com.ershi.hichat.common.chat.domain.enums.MessageTypeEnum;
 import com.ershi.hichat.common.chat.domain.vo.request.ChatMessageReq;
 import com.ershi.hichat.common.chat.service.adapter.MessageAdapter;
@@ -71,7 +70,7 @@ public abstract class AbstractMsgHandler <Req>{
      * @param uid 发送者uid
      * @return {@link Long } 消息持久化后的msgId
      */
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public Long checkAndSaveMsg(ChatMessageReq chatMessageReq, Long uid) {
         // 获取消息体的正确类型
         Req messageBody = this.toBean(chatMessageReq.getMessageBody());
@@ -85,7 +84,8 @@ public abstract class AbstractMsgHandler <Req>{
         Message insert = MessageAdapter.buildMsgSave(chatMessageReq, uid);
         messageDao.save(insert);
 
-        // 子类根据不同的消息类型保存扩展信息
+        // 子类根据不同的消息类型保存extra扩展信息
+        // todo 事务失效，暂不清楚原因
         saveMsg(insert, messageBody);
         return insert.getId();
     }

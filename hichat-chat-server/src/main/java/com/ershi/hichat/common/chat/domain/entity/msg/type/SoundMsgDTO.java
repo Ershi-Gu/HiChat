@@ -9,7 +9,9 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
+import javax.validation.constraints.Max;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 import java.io.Serializable;
 
 /**
@@ -26,6 +28,7 @@ public class SoundMsgDTO extends BaseFileDTO implements BaseMsgDTO, Serializable
     private static final long serialVersionUID = -1401071204376422615L;
 
     @ApiModelProperty("时长（秒）")
+    @Size(max = 60, message = "语音时长不能超过60秒哦")
     @NotNull
     private Integer second;
 }

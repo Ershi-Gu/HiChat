@@ -8,7 +8,9 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Size;
 import java.io.Serializable;
+import java.util.List;
 
 /**
  * 文本消息参数
@@ -23,6 +25,7 @@ public class TextMsgDTO implements BaseMsgDTO, Serializable {
     private static final long serialVersionUID = 3598080947382565713L;
 
     @ApiModelProperty("文本消息内容")
+    @Size(max = 1024, message = "消息内容过长啊兄嘚")
     @NotBlank
     private String content;
 
@@ -30,5 +33,6 @@ public class TextMsgDTO implements BaseMsgDTO, Serializable {
     private Long replyMsgId;
 
     @ApiModelProperty("艾特的uid，如果是全体艾特传 0")
-    private Long[] atUidList;
+    @Size(max = 10, message = "一次最多艾特10人哦")
+    private List<Long> atUidList;
 }

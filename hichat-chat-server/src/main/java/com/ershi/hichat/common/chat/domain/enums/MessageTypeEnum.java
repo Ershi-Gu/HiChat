@@ -17,7 +17,7 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 @Getter
 public enum MessageTypeEnum {
-    TEXT(1, "正常消息"),
+    TEXT(1, "文本消息"),
     RECALL(2, "撤回消息"),
     IMG(3, "图片"),
     FILE(4, "文件"),
