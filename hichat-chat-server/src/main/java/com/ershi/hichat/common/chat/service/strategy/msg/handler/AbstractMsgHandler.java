@@ -75,7 +75,7 @@ public abstract class AbstractMsgHandler <Req>{
         // 获取消息体的正确类型
         Req messageBody = this.toBean(chatMessageReq.getMessageBody());
 
-        // 消息基本注解校验，根据ChatMessageReq中messageBody的validate注解校验
+        // 消息基本注解校验，校验ChatMessageReq中messageBody的validate注解校验
         AssertUtil.allCheckValidateThrow(messageBody);
         // 子类扩展校验规则
         checkMsg(messageBody, chatMessageReq.getRoomId(), uid);
@@ -85,7 +85,6 @@ public abstract class AbstractMsgHandler <Req>{
         messageDao.save(insert);
 
         // 子类根据不同的消息类型保存extra扩展信息
-        // todo 事务失效，暂不清楚原因
         saveMsg(insert, messageBody);
         return insert.getId();
     }

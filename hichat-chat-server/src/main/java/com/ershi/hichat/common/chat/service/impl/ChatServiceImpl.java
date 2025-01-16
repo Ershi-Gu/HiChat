@@ -19,6 +19,7 @@ import com.ershi.hichat.common.common.utils.AssertUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * @author Ershi
@@ -49,6 +50,7 @@ public class ChatServiceImpl implements  ChatService {
      * @return {@link Long }
      */
     @Override
+    @Transactional
     public Long sendMsg(ChatMessageReq chatMessageReq, Long uid) {
         // 检查用户是否有在该房间聊天的权限
         check(chatMessageReq, uid);
