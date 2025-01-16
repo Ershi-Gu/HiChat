@@ -39,11 +39,6 @@ mybatis-plus:
 # 微信公众号
 wx:
   mp:
-    useRedis: false
-    redisConfig:
-      host: 127.0.0.1
-      port: 6379
-      timeout: 2000
     #    callback: http://f4cd-113-92-129-127.ngrok.io
     callback: ${hichat.wx.callback}
     configs:

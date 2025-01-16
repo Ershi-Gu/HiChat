@@ -34,6 +34,16 @@ public class RedisKey {
     public static final String USER_INFO_STRING = "userInfo:uid_%d";
 
     /**
+     * 房间信息
+     */
+    public static final String ROOM_INFO_STRING = "roomInfo:roomId_%d";
+
+    /**
+     * 群聊房间信息
+     */
+    public static final String ROOM_GROUP_INFO_STRING = "roomGroupInfo:roomId_%d";
+
+    /**
      * 获取key
      *
      * @param key 带有模板字符串的key

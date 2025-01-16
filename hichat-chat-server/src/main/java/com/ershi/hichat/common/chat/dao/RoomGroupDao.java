@@ -5,6 +5,8 @@ import com.ershi.hichat.common.chat.mapper.RoomGroupMapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 /**
  * <p>
  * 群聊房间表 服务实现类
@@ -16,4 +18,14 @@ import org.springframework.stereotype.Service;
 @Service
 public class RoomGroupDao extends ServiceImpl<RoomGroupMapper, RoomGroup> {
 
+    /**
+     * 根据房间id列表查询群聊房间
+     * @param roomIds
+     * @return {@link List }<{@link RoomGroup }>
+     */
+    public List<RoomGroup> listByRoomIds(List<Long> roomIds) {
+        return lambdaQuery()
+                .in(RoomGroup::getRoomId, roomIds)
+                .list();
+    }
 }

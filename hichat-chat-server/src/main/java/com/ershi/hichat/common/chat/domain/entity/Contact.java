@@ -12,18 +12,18 @@ import java.util.Date;
 
 /**
  * <p>
- * 单聊房间表
+ * 会话列表
  * </p>
  *
  * @author <a href="https://github.com/Ershi-Gu">Ershi</a>
- * @since 2024-12-30
+ * @since 2025-01-13
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
-@TableName("room_friend")
-public class RoomFriend implements Serializable {
+@TableName("contact")
+public class Contact implements Serializable {
 
-    private static final long serialVersionUID = 2371127237300708959L;
+    private static final long serialVersionUID = 286839647750518589L;
 
     /**
      * id
@@ -32,34 +32,22 @@ public class RoomFriend implements Serializable {
     private Long id;
 
     /**
+     * uid
+     */
+    @TableField("uid")
+    private Long uid;
+
+    /**
      * 房间id
      */
     @TableField("room_id")
     private Long roomId;
 
     /**
-     * uid1（更小的uid）
+     * 阅读到的最后一条消息id
      */
-    @TableField("uid1")
-    private Long uid1;
-
-    /**
-     * uid2（更大的uid）
-     */
-    @TableField("uid2")
-    private Long uid2;
-
-    /**
-     * 房间key由两个uid拼接，先做排序uid1_uid2
-     */
-    @TableField("room_key")
-    private String roomKey;
-
-    /**
-     * 房间状态 0正常 1禁用(删好友了禁用)
-     */
-    @TableField("status")
-    private Integer status;
+    @TableField("read_msg_id")
+    private Long readMsgId;
 
     /**
      * 创建时间
