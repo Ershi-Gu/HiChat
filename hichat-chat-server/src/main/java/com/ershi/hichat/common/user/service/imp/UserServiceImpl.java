@@ -16,11 +16,14 @@ import com.ershi.hichat.common.user.domain.entity.User;
 import com.ershi.hichat.common.user.domain.entity.UserBackpack;
 import com.ershi.hichat.common.user.domain.enums.ItemEnum;
 import com.ershi.hichat.common.user.domain.enums.ItemTypeEnum;
+import com.ershi.hichat.common.user.domain.vo.request.user.AggregateItemInfoReq;
 import com.ershi.hichat.common.user.domain.vo.request.user.AggregateUserInfoReq;
+import com.ershi.hichat.common.user.domain.vo.response.user.AggregateItemInfoResp;
 import com.ershi.hichat.common.user.domain.vo.response.user.AggregateUserInfoResp;
 import com.ershi.hichat.common.user.domain.vo.response.user.BadgeResp;
 import com.ershi.hichat.common.user.domain.vo.response.user.UserInfoResp;
 import com.ershi.hichat.common.user.service.UserService;
+import com.ershi.hichat.common.user.service.adapter.AggregateItemInfoAdapter;
 import com.ershi.hichat.common.user.service.adapter.BlackAdapter;
 import com.ershi.hichat.common.user.service.adapter.UserAdapter;
 import com.ershi.hichat.common.user.service.cache.AggregateUserInfoCache;
@@ -249,5 +252,26 @@ public class UserServiceImpl implements UserService {
             }
         }
         return needSyncUidList;
+    }
+
+    /**
+     * 获取聚合徽章信息
+     * @param aggregateItemInfoResp
+     * @return {@link List }<{@link AggregateItemInfoResp }>
+     */
+    @Override
+    public List<AggregateItemInfoResp> getAggregateItemInfo(AggregateItemInfoReq aggregateItemInfoReq) {
+        /**
+         * 因为徽章信息不是非常重要的信息，就直接根据db中的更新时间做判断了，没有像用户信息那样缓存判断
+         */
+        return aggregateItemInfoReq.getReqList().stream().map(reqInfo -> { // 获取请求的徽章id
+            // 从缓存中获取徽章信息
+            ItemConfig itemConfig = itemCache.getById(reqInfo.getItemId());
+            // 根据徽章信息在db中的更新时间判断是否需要刷新前端资源
+            if (Objects.nonNull(reqInfo.getLastModifyTime()) && reqInfo.getLastModifyTime() >= itemConfig.getUpdateTime().getTime()) {
+                return AggregateItemInfoResp.skip(reqInfo.getItemId());
+            }
+            return AggregateItemInfoAdapter.buildResp(itemConfig);
+        }).collect(Collectors.toList());
     }
 }

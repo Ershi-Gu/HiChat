@@ -16,8 +16,7 @@ import static com.ershi.hichat.common.common.constant.SpringCacheConstant.ITEM_C
  * @date 2024/12/06
  */
 @Component
-public class ItemCache {
-
+public class ItemCache { // todo 改为多级缓存Redis存储
     @Autowired
     private ItemConfigDao itemConfigDao;
 

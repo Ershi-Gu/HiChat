@@ -5,10 +5,8 @@ import com.ershi.hichat.common.common.annotation.AuthCheck;
 import com.ershi.hichat.common.common.domain.vo.ApiResult;
 import com.ershi.hichat.common.common.utils.RequestHolder;
 import com.ershi.hichat.common.user.domain.enums.RoleEnum;
-import com.ershi.hichat.common.user.domain.vo.request.user.AggregateUserInfoReq;
-import com.ershi.hichat.common.user.domain.vo.request.user.BlackReq;
-import com.ershi.hichat.common.user.domain.vo.request.user.ModifyNameReq;
-import com.ershi.hichat.common.user.domain.vo.request.user.WearingBadgesReq;
+import com.ershi.hichat.common.user.domain.vo.request.user.*;
+import com.ershi.hichat.common.user.domain.vo.response.user.AggregateItemInfoResp;
 import com.ershi.hichat.common.user.domain.vo.response.user.AggregateUserInfoResp;
 import com.ershi.hichat.common.user.domain.vo.response.user.BadgeResp;
 import com.ershi.hichat.common.user.domain.vo.response.user.UserInfoResp;
@@ -36,6 +34,8 @@ public class UserController {
 
     @Autowired
     private UserService userService;
+
+
 
     @GetMapping("/userInfo")
     @ApiOperation("获取用户个人信息")
@@ -85,5 +85,10 @@ public class UserController {
         return ApiResult.success(userService.getAggregateUserInfo(aggregateUserInfoReq));
     }
 
+    @PostMapping("/public/badges/batch")
+    @ApiOperation("聚合获取需要刷新的徽章信息")
+    public ApiResult<List<AggregateItemInfoResp>> getItemInfo(@Valid @RequestBody AggregateItemInfoReq aggregateItemInfoReq) {
+        return ApiResult.success(userService.getAggregateItemInfo(aggregateItemInfoReq));
+    }
 }
 
