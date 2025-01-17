@@ -1,7 +1,9 @@
 package com.ershi.hichat.common.user.service;
 
 import com.ershi.hichat.common.user.domain.entity.User;
+import com.ershi.hichat.common.user.domain.vo.request.user.AggregateItemInfoReq;
 import com.ershi.hichat.common.user.domain.vo.request.user.AggregateUserInfoReq;
+import com.ershi.hichat.common.user.domain.vo.response.user.AggregateItemInfoResp;
 import com.ershi.hichat.common.user.domain.vo.response.user.AggregateUserInfoResp;
 import com.ershi.hichat.common.user.domain.vo.response.user.BadgeResp;
 import com.ershi.hichat.common.user.domain.vo.response.user.UserInfoResp;
@@ -35,4 +37,6 @@ public interface UserService {
     void blackUserAndIp(Long uid);
 
     List<AggregateUserInfoResp> getAggregateUserInfo(AggregateUserInfoReq aggregateUserInfoReq);
+
+    List<AggregateItemInfoResp> getAggregateItemInfo(AggregateItemInfoReq aggregateItemInfoReq);
 }
