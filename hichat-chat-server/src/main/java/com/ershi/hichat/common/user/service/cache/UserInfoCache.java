@@ -104,4 +104,14 @@ public class UserInfoCache extends AbstractRedisStringCache<Long, User> {
         List<String> keys = uidList.stream().map(uid -> RedisKey.getKey(RedisKey.USER_LAST_MODIFY_STRING, uid)).collect(Collectors.toList());
         return RedisUtils.mget(keys, Long.class);
     }
+
+    /**
+     * 判断用户是否在线
+     * @param uid
+     * @return boolean
+     */
+    public boolean isOnline(Long uid) {
+        String onlineKey = RedisKey.getKey(RedisKey.ONLINE_UID_ZET);
+        return RedisUtils.zIsMember(onlineKey, uid);
+    }
 }

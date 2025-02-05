@@ -2,6 +2,7 @@ package com.ershi.hichat.common.chat.service.strategy.msg.handler.type;
 
 import com.ershi.hichat.common.chat.dao.MessageDao;
 import com.ershi.hichat.common.chat.domain.entity.Message;
+import com.ershi.hichat.common.chat.domain.entity.msg.BaseMsgDTO;
 import com.ershi.hichat.common.chat.domain.entity.msg.MessageExtra;
 import com.ershi.hichat.common.chat.domain.entity.msg.type.VideoMsgDTO;
 import com.ershi.hichat.common.chat.domain.enums.MessageTypeEnum;
@@ -38,7 +39,12 @@ public class VideoMsgHandler extends AbstractMsgHandler<VideoMsgDTO> {
         Message update = new Message();
         update.setId(msg.getId());
         update.setExtra(extra);
-        extra.setVideoMsg(videoMsgDTO);
+        extra.setVideoMsgDTO(videoMsgDTO);
         messageDao.updateById(update);
+    }
+
+    @Override
+    public BaseMsgDTO showMsg(Message msg) {
+        return msg.getExtra().getVideoMsgDTO();
     }
 }

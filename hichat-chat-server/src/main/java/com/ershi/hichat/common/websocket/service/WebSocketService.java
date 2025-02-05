@@ -24,4 +24,6 @@ public interface WebSocketService {
     void authorize(Channel channel, String token);
 
     void sendMsgToAllOnline(WSBaseResp<?> wsBaseResp, List<Long> skipUid);
+
+    void sendToUid(WSBaseResp<?> wsBaseMsg, Long uid);
 }

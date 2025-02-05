@@ -41,7 +41,7 @@ public class NettyUtil {
      * @param attributeKey 属性键
      * @return {@link T}
      */
-    public static <T> T get(Channel channel, AttributeKey<T> attributeKey) {
+    public static <T> T getAttr(Channel channel, AttributeKey<T> attributeKey) {
         return channel.attr(attributeKey).get();
     }
 

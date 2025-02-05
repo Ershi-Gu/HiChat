@@ -69,13 +69,13 @@ public class NettyWebSocketServerHandler extends SimpleChannelInboundHandler<Tex
             IdleState state = event.state();
             if (state == IdleState.READER_IDLE) {
                 // 用户下线，同时关闭连接
-                userOffline(ctx.channel());
+//                userOffline(ctx.channel());
             }
         }
         // 握手认证
         else if (evt instanceof WebSocketServerProtocolHandler.HandshakeComplete) {
             // 从channel中获取保存的token数据
-            String token = NettyUtil.get(ctx.channel(), NettyUtil.TOKEN);
+            String token = NettyUtil.getAttr(ctx.channel(), NettyUtil.TOKEN);
             if (Strings.isNotBlank(token)) {
                 webSocketService.authorize(ctx.channel(), token);
             }

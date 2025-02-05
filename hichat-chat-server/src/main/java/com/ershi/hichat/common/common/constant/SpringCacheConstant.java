@@ -17,4 +17,9 @@ public class SpringCacheConstant {
      */
     public static final String USER_CACHE_NAME = "user";
 
+    /**
+     * 房间成员缓存
+     */
+    public static final String GROUP_MEMBER_CACHE_NAME = "member";
+
 }

@@ -28,4 +28,15 @@ public class RoomGroupDao extends ServiceImpl<RoomGroupMapper, RoomGroup> {
                 .in(RoomGroup::getRoomId, roomIds)
                 .list();
     }
+
+    /**
+     * 根据房间id查询房间信息
+     * @param roomId
+     * @return {@link RoomGroup }
+     */
+    public RoomGroup getByRoomId(Long roomId) {
+        return lambdaQuery()
+                .eq(RoomGroup::getRoomId, roomId)
+                .one();
+    }
 }
