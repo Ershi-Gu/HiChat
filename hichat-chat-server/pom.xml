@@ -30,6 +30,12 @@
             <groupId>com.auth0</groupId>
             <artifactId>java-jwt</artifactId>
         </dependency>
+        <!--hichat-transaction-->
+        <dependency>
+            <groupId>com.ershi</groupId>
+            <artifactId>hichat-transaction</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
     </dependencies>
     <build>
         <plugins>

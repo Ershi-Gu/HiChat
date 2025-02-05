@@ -12,7 +12,6 @@
   <modules>
     <module>hichat-chat-server</module>
     <module>hichat-tools</module>
-    <module>hichat-tools/hichat-common-starter</module>
   </modules>
 
   <!--springboot版本-->
@@ -47,6 +46,7 @@
     <spring-test.version>5.3.19</spring-test.version>
     <jwt.version>3.19.0</jwt.version>
     <ip2region.version>2.7.0</ip2region.version>
+    <rocketmq-spring-boot-starter.version>2.2.2</rocketmq-spring-boot-starter.version>
   </properties>
 
   <!--依赖管理-->
@@ -150,6 +150,12 @@
         <groupId>org.lionsoul</groupId>
         <artifactId>ip2region</artifactId>
         <version>${ip2region.version}</version>
+      </dependency>
+      <!--rocketmq-->
+      <dependency>
+        <groupId>org.apache.rocketmq</groupId>
+        <artifactId>rocketmq-spring-boot-starter</artifactId>
+        <version>${rocketmq-spring-boot-starter.version}</version>
       </dependency>
     </dependencies>
 

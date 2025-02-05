@@ -9,6 +9,10 @@
 
     <artifactId>hichat-tools</artifactId>
     <packaging>pom</packaging>
+    <modules>
+        <module>hichat-common-starter</module>
+        <module>hichat-transaction</module>
+    </modules>
 
     <name>hichat-tools</name>
     <url>http://maven.apache.org</url>
