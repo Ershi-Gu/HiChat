@@ -1,5 +1,7 @@
 package com.ershi.hichat.common.websocket.service.impl;
 
+import cn.hutool.core.collection.CollectionUtil;
+import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.RandomUtil;
 import cn.hutool.json.JSONUtil;
 import com.ershi.hichat.common.common.config.ThreadPoolConfig;
@@ -7,6 +9,8 @@ import com.ershi.hichat.common.common.event.UserOnlineEvent;
 import com.ershi.hichat.common.user.dao.UserDao;
 import com.ershi.hichat.common.user.domain.entity.User;
 import com.ershi.hichat.common.user.domain.enums.ChatActiveStatusEnum;
+import com.ershi.hichat.common.user.service.cache.UserInfoCache;
+import com.ershi.hichat.common.user.service.cache.UserLoginCache;
 import com.ershi.hichat.common.websocket.domain.vo.response.WSBaseResp;
 import com.ershi.hichat.common.user.service.LoginService;
 import com.ershi.hichat.common.user.service.UserRoleService;
@@ -19,6 +23,7 @@ import com.github.benmanes.caffeine.cache.Caffeine;
 import io.netty.channel.Channel;
 import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
 import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
 import me.chanjar.weixin.mp.api.WxMpService;
 import me.chanjar.weixin.mp.bean.result.WxMpQrCodeTicket;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,7 +38,9 @@ import java.time.Duration;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * 专门用于管理websocket相关的逻辑，包括推拉消息
@@ -42,12 +49,8 @@ import java.util.concurrent.ConcurrentHashMap;
  * @date 2024/11/26
  */
 @Service
+@Slf4j
 public class WebSocketServiceImpl implements WebSocketService {
-
-    /**
-     * 管理所有在线用户的连接（登录态/游客）
-     */
-    private static final ConcurrentHashMap<Channel, WSChannelExtraDTO> ONLINE_WS_MAP = new ConcurrentHashMap<>();
 
     /**
      * 登录码过期时间
@@ -65,6 +68,16 @@ public class WebSocketServiceImpl implements WebSocketService {
             .maximumSize(CODE_MAXIMUM_SIZE)
             .expireAfterWrite(CODE_EXPIRE_TIME)
             .build();
+
+    /**
+     * 管理所有在线用户的连接（登录态&游客）=> 管理连接用
+     */
+    private static final ConcurrentHashMap<Channel, WSChannelExtraDTO> ONLINE_WS_MAP = new ConcurrentHashMap<>();
+
+    /**
+     * 在线用户及其连接 Uid-Channel => 记录登录态用，实际就是ONLINE_WS_MAP的翻转，便于查询
+     */
+    private static final ConcurrentHashMap<Long, CopyOnWriteArrayList<Channel>> ONLINE_UID_MAP = new ConcurrentHashMap<>();
 
     /**
      * 微信业务处理器
@@ -91,6 +104,9 @@ public class WebSocketServiceImpl implements WebSocketService {
     @Autowired
     @Qualifier(ThreadPoolConfig.WS_EXECUTOR)
     private ThreadPoolTaskExecutor threadPoolTaskExecutor;
+
+    @Autowired
+    private UserInfoCache userInfoCache;
 
 
     /**
@@ -120,14 +136,65 @@ public class WebSocketServiceImpl implements WebSocketService {
     }
 
     /**
+     * 用户上线
+     */
+    private void online(Channel channel, Long uid) {
+        getOrInitChannelExt(channel).setUid(uid);
+        ONLINE_UID_MAP.putIfAbsent(uid, new CopyOnWriteArrayList<>());
+        ONLINE_UID_MAP.get(uid).add(channel);
+        NettyUtil.setAttr(channel, NettyUtil.UID, uid);
+    }
+
+    /**
+     * 如果在线列表不存在，就把当前channel放进在线列表
+     *
+     * @param channel
+     * @return
+     */
+    private WSChannelExtraDTO getOrInitChannelExt(Channel channel) {
+        WSChannelExtraDTO wsChannelExtraDTO =
+                ONLINE_WS_MAP.getOrDefault(channel, new WSChannelExtraDTO());
+        WSChannelExtraDTO old = ONLINE_WS_MAP.putIfAbsent(channel, wsChannelExtraDTO);
+        return ObjectUtil.isNull(old) ? wsChannelExtraDTO : old;
+    }
+
+    /**
      * 移除保存的用户登录连接
      *
      * @param channel
      */
     @Override
     public void remove(Channel channel) {
+        // 删除连接
+        WSChannelExtraDTO wsChannelExtraDTO = ONLINE_WS_MAP.get(channel);
+        Optional<Long> uidOptional = Optional.ofNullable(wsChannelExtraDTO)
+                .map(WSChannelExtraDTO::getUid);
+        // 判断用户是否多端全部下线
+        boolean offlineAll = offline(channel, uidOptional);
+        if (uidOptional.isPresent() && offlineAll) {  // 已登录用户断连,并且全下线成功
+            User user = new User();
+            user.setId(uidOptional.get());
+            user.setLastOptTime(new Date());
+            // todo 发出用户下线通知
+        }
+    }
+
+    /**
+     * 用户下线，用于判断多端是否全部下线
+     * @param channel
+     * @param uidOptional
+     * @return boolean 是否全下线成功
+     */
+    private boolean offline(Channel channel, Optional<Long> uidOptional) {
         ONLINE_WS_MAP.remove(channel);
-        // todo 发出用户下线事件
+        if (uidOptional.isPresent()) {
+            CopyOnWriteArrayList<Channel> channels = ONLINE_UID_MAP.get(uidOptional.get());
+            if (CollectionUtil.isNotEmpty(channels)) {
+                channels.removeIf(ch -> Objects.equals(ch, channel));
+            }
+            return CollectionUtil.isEmpty(ONLINE_UID_MAP.get(uidOptional.get()));
+        }
+        return true;
     }
 
     /**
@@ -160,16 +227,22 @@ public class WebSocketServiceImpl implements WebSocketService {
      * @param token
      */
     private void publishLoginSuccess(Channel channel, User user, String token) {
-        // 保存channel-uid映射
-        WSChannelExtraDTO wsChannelExtraDTO = ONLINE_WS_MAP.get(channel);
-        wsChannelExtraDTO.setUid(user.getId());
-        // 更新相关在线信息
+        // 登录成功，更新上线列表
+        online(channel, user.getId());
+        // 更新用户相关在线信息
         updateUserOnlineInfo(channel, user);
-        applicationEventPublisher.publishEvent(new UserOnlineEvent(this, user));
         // 获取用户最高权限
         Integer userTopRule = userRoleService.getUserTopRule(user.getId());
         // 推送前端登录成功消息
         sendMsg(channel, WebSocketAdapter.buildTokenResp(user, token, userTopRule));
+        // 判断用户是否在线过，防御性编程
+        boolean isAlreadyOnline = userInfoCache.isOnline(user.getId());
+        if (!isAlreadyOnline) {
+            user.setLastOptTime(new Date());
+            user.refreshIpInfo(NettyUtil.getAttr(channel, NettyUtil.IP));
+            // 发出用户上线通知
+            applicationEventPublisher.publishEvent(new UserOnlineEvent(this, user));
+        }
     }
 
     /**
@@ -231,6 +304,23 @@ public class WebSocketServiceImpl implements WebSocketService {
      */
     private <T> void sendMsg(Channel channel, WSBaseResp<T> msg) {
         channel.writeAndFlush(new TextWebSocketFrame(JSONUtil.toJsonStr(msg)));
+    }
+
+    /**
+     * 发送消息给指定用户
+     * @param wsBaseMsg
+     * @param uid
+     */
+    @Override
+    public void sendToUid(WSBaseResp<?> wsBaseResp, Long uid){
+        CopyOnWriteArrayList<Channel> channels = ONLINE_UID_MAP.get(uid);
+        if (CollectionUtil.isEmpty(channels)) {
+            log.info("用户：{}不在线", uid);
+            return;
+        }
+        channels.forEach(channel -> {
+            threadPoolTaskExecutor.execute(() -> sendMsg(channel, wsBaseResp));
+        });
     }
 
     /**

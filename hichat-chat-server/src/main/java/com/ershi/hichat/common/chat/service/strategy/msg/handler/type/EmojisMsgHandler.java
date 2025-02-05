@@ -2,6 +2,7 @@ package com.ershi.hichat.common.chat.service.strategy.msg.handler.type;
 
 import com.ershi.hichat.common.chat.dao.MessageDao;
 import com.ershi.hichat.common.chat.domain.entity.Message;
+import com.ershi.hichat.common.chat.domain.entity.msg.BaseMsgDTO;
 import com.ershi.hichat.common.chat.domain.entity.msg.MessageExtra;
 import com.ershi.hichat.common.chat.domain.entity.msg.type.EmojisMsgDTO;
 import com.ershi.hichat.common.chat.domain.enums.MessageTypeEnum;
@@ -44,7 +45,12 @@ public class EmojisMsgHandler extends AbstractMsgHandler<EmojisMsgDTO> {
         Message update = new Message();
         update.setId(msg.getId());
         update.setExtra(extra);
-        extra.setEmojisMsg(emojisMsgDTO);
+        extra.setEmojisMsgDTO(emojisMsgDTO);
         messageDao.updateById(update);
+    }
+
+    @Override
+    public BaseMsgDTO showMsg(Message msg) {
+        return msg.getExtra().getEmojisMsgDTO();
     }
 }

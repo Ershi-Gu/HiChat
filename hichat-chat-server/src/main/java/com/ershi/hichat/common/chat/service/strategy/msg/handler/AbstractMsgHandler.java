@@ -3,6 +3,7 @@ package com.ershi.hichat.common.chat.service.strategy.msg.handler;
 import cn.hutool.core.bean.BeanUtil;
 import com.ershi.hichat.common.chat.dao.MessageDao;
 import com.ershi.hichat.common.chat.domain.entity.Message;
+import com.ershi.hichat.common.chat.domain.entity.msg.BaseMsgDTO;
 import com.ershi.hichat.common.chat.domain.enums.MessageTypeEnum;
 import com.ershi.hichat.common.chat.domain.vo.request.ChatMessageReq;
 import com.ershi.hichat.common.chat.service.adapter.MessageAdapter;
@@ -63,6 +64,15 @@ public abstract class AbstractMsgHandler <Req>{
      * @param messageBody
      */
     protected abstract void saveMsg(Message message, Req messageBody);
+
+    /**
+     * 展示消息
+     *
+     * @param msg
+     * @return {@link Object }
+     */
+    public abstract BaseMsgDTO showMsg(Message msg);
+
 
     /**
      * 检查消息合法性，并持久化消息到服务器

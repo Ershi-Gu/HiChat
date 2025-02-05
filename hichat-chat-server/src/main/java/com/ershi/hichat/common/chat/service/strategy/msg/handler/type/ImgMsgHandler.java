@@ -2,6 +2,7 @@ package com.ershi.hichat.common.chat.service.strategy.msg.handler.type;
 
 import com.ershi.hichat.common.chat.dao.MessageDao;
 import com.ershi.hichat.common.chat.domain.entity.Message;
+import com.ershi.hichat.common.chat.domain.entity.msg.BaseMsgDTO;
 import com.ershi.hichat.common.chat.domain.entity.msg.MessageExtra;
 import com.ershi.hichat.common.chat.domain.entity.msg.type.ImgMsgDTO;
 import com.ershi.hichat.common.chat.domain.enums.MessageTypeEnum;
@@ -41,7 +42,12 @@ public class ImgMsgHandler extends AbstractMsgHandler<ImgMsgDTO> {
         Message update = new Message();
         update.setId(msg.getId());
         update.setExtra(extra);
-        extra.setImgMsg(imgMsgDTO);
+        extra.setImgMsgDTO(imgMsgDTO);
         messageDao.updateById(update);
+    }
+
+    @Override
+    public BaseMsgDTO showMsg(Message msg) {
+        return msg.getExtra().getImgMsgDTO();
     }
 }

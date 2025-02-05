@@ -9,9 +9,9 @@ import lombok.NoArgsConstructor;
 import java.util.Date;
 
 /**
- * Description: 群成员列表的成员信息
- * Author: <a href="https://github.com/zongzibinbin">abin</a>
- * Date: 2023-03-23
+ * 群成员列表的成员在线信息
+ * @author Ershi
+ * @date 2025/02/05
  */
 @Data
 @Builder

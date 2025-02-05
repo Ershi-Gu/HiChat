@@ -5,6 +5,7 @@ import cn.hutool.core.collection.CollectionUtil;
 import com.ershi.hichat.common.chat.dao.MessageDao;
 import com.ershi.hichat.common.chat.domain.entity.Message;
 import com.ershi.hichat.common.chat.domain.entity.RoomGroup;
+import com.ershi.hichat.common.chat.domain.entity.msg.BaseMsgDTO;
 import com.ershi.hichat.common.chat.domain.entity.msg.MessageExtra;
 import com.ershi.hichat.common.chat.domain.entity.msg.type.TextMsgDTO;
 import com.ershi.hichat.common.chat.domain.enums.MessageTypeEnum;
@@ -107,7 +108,12 @@ public class TextMsgHandler extends AbstractMsgHandler<TextMsgDTO> {
         Message update = new Message();
         update.setId(msg.getId());
         update.setExtra(extra);
-        extra.setTextMsg(textMsgDTO);
+        extra.setTextMsgDTO(textMsgDTO);
         messageDao.updateById(update);
+    }
+
+    @Override
+    public BaseMsgDTO showMsg(Message msg) {
+        return msg.getExtra().getTextMsgDTO();
     }
 }

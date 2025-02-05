@@ -1,5 +1,6 @@
 package com.ershi.hichat.common.chat.service;
 
+import com.ershi.hichat.common.chat.domain.entity.Message;
 import com.ershi.hichat.common.chat.domain.vo.request.ChatMessageReq;
 import com.ershi.hichat.common.chat.domain.vo.response.ChatMessageResp;
 
@@ -11,5 +12,7 @@ import com.ershi.hichat.common.chat.domain.vo.response.ChatMessageResp;
 public interface ChatService {
     Long sendMsg(ChatMessageReq chatMessageReq, Long uid);
 
-    ChatMessageResp getMsgResp(Long msgId, Long uid);
+    ChatMessageResp getMsgResp(Long msgId, Long receiveUid);
+
+    ChatMessageResp getMsgResp(Message message, Long receiveUid);
 }
