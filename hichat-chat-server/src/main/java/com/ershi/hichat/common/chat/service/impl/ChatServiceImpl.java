@@ -1,15 +1,16 @@
 package com.ershi.hichat.common.chat.service.impl;
 
+import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.collection.CollectionUtil;
 import com.ershi.hichat.common.chat.dao.GroupMemberDao;
+import com.ershi.hichat.common.chat.dao.MessageDao;
 import com.ershi.hichat.common.chat.dao.RoomFriendDao;
-import com.ershi.hichat.common.chat.domain.entity.GroupMember;
-import com.ershi.hichat.common.chat.domain.entity.Room;
-import com.ershi.hichat.common.chat.domain.entity.RoomFriend;
-import com.ershi.hichat.common.chat.domain.entity.RoomGroup;
+import com.ershi.hichat.common.chat.domain.entity.*;
 import com.ershi.hichat.common.chat.domain.enums.RoomStatusEnum;
 import com.ershi.hichat.common.chat.domain.vo.request.ChatMessageReq;
 import com.ershi.hichat.common.chat.domain.vo.response.ChatMessageResp;
 import com.ershi.hichat.common.chat.service.ChatService;
+import com.ershi.hichat.common.chat.service.adapter.MessageAdapter;
 import com.ershi.hichat.common.chat.service.cache.RoomCache;
 import com.ershi.hichat.common.chat.service.cache.RoomGroupCache;
 import com.ershi.hichat.common.chat.service.strategy.msg.MsgHandlerFactory;
@@ -20,6 +21,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @author Ershi
@@ -41,6 +47,9 @@ public class ChatServiceImpl implements  ChatService {
     private GroupMemberDao groupMemberDao;
 
     @Autowired
+    private MessageDao messageDao;
+
+    @Autowired
     private ApplicationEventPublisher applicationEventPublisher;
 
     /**
@@ -59,7 +68,6 @@ public class ChatServiceImpl implements  ChatService {
         // 检查并持久化消息
         Long msgId = msgHandler.checkAndSaveMsg(chatMessageReq, uid);
         // 发布消息发送事件
-        // todo 事件接收处理
         applicationEventPublisher.publishEvent(new MessageSendEvent(this, msgId));
         return msgId;
     }
@@ -72,6 +80,7 @@ public class ChatServiceImpl implements  ChatService {
     private void check(ChatMessageReq chatMessageReq, Long uid) {
         // 获取请求发送的房间信息
         Room room = roomCache.get(chatMessageReq.getRoomId());
+        AssertUtil.nonNull(room, "房间不存在");
         // 判断单聊状态
         if (room.isRoomFriend()) {
             // 获取单聊房间状态
@@ -90,9 +99,33 @@ public class ChatServiceImpl implements  ChatService {
         }
     }
 
-    // todo 消息返回展示
+    /**
+     * 获取消息返回体
+     * @param msgId
+     * @param receiveUid
+     * @return {@link ChatMessageResp }
+     */
     @Override
-    public ChatMessageResp getMsgResp(Long msgId, Long uid) {
-        return null;
+    public ChatMessageResp getMsgResp(Long msgId, Long receiveUid) {
+        Message msg = messageDao.getById(msgId);
+        return getMsgResp(msg, receiveUid);
+    }
+
+    @Override
+    public ChatMessageResp getMsgResp(Message message, Long receiveUid) {
+        return CollUtil.getFirst(getMsgRespBatch(Collections.singletonList(message), receiveUid));
+    }
+
+    /**
+     * 批量获取消息返回体
+     * @param messages
+     * @param receiveUid
+     * @return {@link List }<{@link ChatMessageResp }>
+     */
+    public List<ChatMessageResp> getMsgRespBatch(List<Message> messages, Long receiveUid) {
+        if (CollectionUtil.isEmpty(messages)) {
+            return new ArrayList<>();
+        }
+        return MessageAdapter.buildMsgResp(messages, receiveUid);
     }
 }

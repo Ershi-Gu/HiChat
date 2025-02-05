@@ -1,8 +1,18 @@
 package com.ershi.hichat.common.chat.service.adapter;
 
+import cn.hutool.core.bean.BeanUtil;
 import com.ershi.hichat.common.chat.domain.entity.Message;
 import com.ershi.hichat.common.chat.domain.enums.MessageStatusEnum;
 import com.ershi.hichat.common.chat.domain.vo.request.ChatMessageReq;
+import com.ershi.hichat.common.chat.domain.vo.response.ChatMessageResp;
+import com.ershi.hichat.common.chat.service.strategy.msg.MsgHandlerFactory;
+import com.ershi.hichat.common.chat.service.strategy.msg.handler.AbstractMsgHandler;
+
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 /**
  * 消息格式转换器
@@ -24,5 +34,32 @@ public class MessageAdapter {
                 .status(MessageStatusEnum.NORMAL.getStatus())
                 .type(chatMessageReq.getMsgType())
                 .build();
+    }
+
+    public static List<ChatMessageResp> buildMsgResp(List<Message> messages, Long receiveUid) {
+        return messages.stream().map(message -> {
+                    ChatMessageResp resp = new ChatMessageResp();
+                    resp.setFromUser(buildFromUser(message.getFromUid()));
+                    resp.setMessageInfo(buildMessage(message , receiveUid));
+                    return resp;
+                })
+                .sorted(Comparator.comparing(message -> message.getMessageInfo().getSendTime()))//帮前端排好序，更方便它展示
+                .collect(Collectors.toList());
+    }
+
+    private static ChatMessageResp.UserInfo buildFromUser(Long fromUid) {
+        ChatMessageResp.UserInfo o = null;
+        return o;
+    }
+
+    private static ChatMessageResp.MessageInfo buildMessage(Message message, Long receiveUid) {
+        ChatMessageResp.MessageInfo messageVO = new ChatMessageResp.MessageInfo();
+        BeanUtil.copyProperties(message, messageVO);
+        messageVO.setSendTime(message.getCreateTime());
+        AbstractMsgHandler<?> msgHandler = MsgHandlerFactory.getMsgHandlerNoNull(message.getType());
+        if (Objects.nonNull(msgHandler)) {
+            messageVO.setMessageBody(msgHandler.showMsg(message));
+        }
+        return messageVO;
     }
 }

@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.ershi.hichat.common.chat.domain.enums.HotFlagEnum;
 import com.ershi.hichat.common.chat.domain.enums.RoomTypeEnum;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
@@ -92,5 +93,14 @@ public class Room implements Serializable {
     @JsonIgnore
     public boolean isRoomGroup() {
         return RoomTypeEnum.of(this.type) == RoomTypeEnum.GROUP;
+    }
+
+    /**
+     * 判断是否是热门群聊
+     * @return boolean
+     */
+    @JsonIgnore
+    public boolean isHotRoom() {
+        return HotFlagEnum.of(this.hotFlag) == HotFlagEnum.YES;
     }
 }

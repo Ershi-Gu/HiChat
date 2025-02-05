@@ -36,29 +36,29 @@ public class MessageExtra implements Serializable {
     /**
      * 消息撤回详情
      */
-    private MsgRecallDTO recall;
+    private MsgRecallDTO msgRecallDTO;
     /**
      * 文本消息
      */
-    private TextMsgDTO textMsg;
+    private TextMsgDTO textMsgDTO;
     /**
      * 文件消息
      */
-    private FileMsgDTO fileMsg;
+    private FileMsgDTO fileMsgDTO;
     /**
      * 图片消息
      */
-    private ImgMsgDTO imgMsg;
+    private ImgMsgDTO imgMsgDTO;
     /**
      * 语音消息
      */
-    private SoundMsgDTO soundMsg;
+    private SoundMsgDTO soundMsgDTO;
     /**
      * 文件消息
      */
-    private VideoMsgDTO videoMsg;
+    private VideoMsgDTO videoMsgDTO;
     /**
      * 表情图片信息
      */
-    private EmojisMsgDTO emojisMsg;
+    private EmojisMsgDTO emojisMsgDTO;
 }
