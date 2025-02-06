@@ -2,13 +2,14 @@ package com.ershi.hichat.common.chat.service.adapter;
 
 import cn.hutool.core.bean.BeanUtil;
 import com.ershi.hichat.common.chat.domain.entity.Message;
+import com.ershi.hichat.common.chat.domain.entity.msg.type.TextMsgDTO;
 import com.ershi.hichat.common.chat.domain.enums.MessageStatusEnum;
+import com.ershi.hichat.common.chat.domain.enums.MessageTypeEnum;
 import com.ershi.hichat.common.chat.domain.vo.request.ChatMessageReq;
 import com.ershi.hichat.common.chat.domain.vo.response.ChatMessageResp;
 import com.ershi.hichat.common.chat.service.strategy.msg.MsgHandlerFactory;
 import com.ershi.hichat.common.chat.service.strategy.msg.handler.AbstractMsgHandler;
 
-import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
@@ -36,6 +37,12 @@ public class MessageAdapter {
                 .build();
     }
 
+    /**
+     * 批量构建消息返回体
+     * @param messages
+     * @param receiveUid
+     * @return {@link List }<{@link ChatMessageResp }>
+     */
     public static List<ChatMessageResp> buildMsgResp(List<Message> messages, Long receiveUid) {
         return messages.stream().map(message -> {
                     ChatMessageResp resp = new ChatMessageResp();
@@ -47,11 +54,23 @@ public class MessageAdapter {
                 .collect(Collectors.toList());
     }
 
+    /**
+     * 构建消息来源者信息
+     * @param fromUid
+     * @return {@link ChatMessageResp.UserInfo }
+     */
     private static ChatMessageResp.UserInfo buildFromUser(Long fromUid) {
-        ChatMessageResp.UserInfo o = null;
-        return o;
+        ChatMessageResp.UserInfo userInfo = new ChatMessageResp.UserInfo();
+        userInfo.setUid(fromUid);
+        return userInfo;
     }
 
+    /**
+     * 构建消息体内容
+     * @param message
+     * @param receiveUid
+     * @return {@link ChatMessageResp.MessageInfo }
+     */
     private static ChatMessageResp.MessageInfo buildMessage(Message message, Long receiveUid) {
         ChatMessageResp.MessageInfo messageVO = new ChatMessageResp.MessageInfo();
         BeanUtil.copyProperties(message, messageVO);
@@ -61,5 +80,18 @@ public class MessageAdapter {
             messageVO.setMessageBody(msgHandler.showMsg(message));
         }
         return messageVO;
+    }
+
+    /**
+     * 构建好友通过后的第一条推送消息
+     * @param roomId
+     * @return {@link ChatMessageReq }
+     */
+    public static ChatMessageReq buildFriendAgreeMsg(Long roomId) {
+        return ChatMessageReq.builder()
+                .roomId(roomId)
+                .msgType(MessageTypeEnum.TEXT.getType())
+                .messageBody(TextMsgDTO.builder().content("我们已经成为好友了，开始聊天吧。").build())
+                .build();
     }
 }
