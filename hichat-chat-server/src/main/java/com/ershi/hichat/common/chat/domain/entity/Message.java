@@ -24,7 +24,7 @@ import java.util.Date;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-@TableName("message")
+@TableName(value = "message", autoResultMap = true)
 public class Message implements Serializable {
 
     private static final long serialVersionUID = 1L;

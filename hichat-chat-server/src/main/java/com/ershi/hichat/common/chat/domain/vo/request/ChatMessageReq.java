@@ -1,6 +1,5 @@
 package com.ershi.hichat.common.chat.domain.vo.request;
 
-import com.ershi.hichat.common.chat.domain.entity.msg.BaseMsgDTO;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

@@ -68,7 +68,6 @@ public class ChatServiceImpl implements  ChatService {
         // 检查并持久化消息
         Long msgId = msgHandler.checkAndSaveMsg(chatMessageReq, uid);
         // 发布消息发送事件
-        // todo 消息事件处理
         applicationEventPublisher.publishEvent(new MessageSendEvent(this, msgId));
         return msgId;
     }
@@ -81,6 +80,7 @@ public class ChatServiceImpl implements  ChatService {
     private void check(ChatMessageReq chatMessageReq, Long uid) {
         // 获取请求发送的房间信息
         Room room = roomCache.get(chatMessageReq.getRoomId());
+        AssertUtil.nonNull(room, "房间不存在");
         // 判断单聊状态
         if (room.isRoomFriend()) {
             // 获取单聊房间状态
