@@ -1,5 +1,6 @@
 package com.ershi.hichat.transaction.service;
 
+import com.ershi.hichat.transaction.annotation.SecureInvoke;
 import org.apache.rocketmq.spring.core.RocketMQTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.Message;
@@ -32,7 +33,7 @@ public class MQProducer {
      * @param topic
      * @param body
      */
-//    @SecureInvoke todo 本地事务表框架开发中
+    @SecureInvoke()
     public void sendSecureMsg(String topic, Object body, Object key) {
         Message<Object> build = MessageBuilder
                 .withPayload(body)

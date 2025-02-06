@@ -1,6 +1,7 @@
 package com.ershi.hichat.common.common.config;
 
 import com.ershi.hichat.common.common.factory.MyThreadFactory;
+import com.ershi.hichat.transaction.config.SecureInvokeConfigurer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
@@ -8,7 +9,6 @@ import org.springframework.scheduling.annotation.AsyncConfigurer;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
-import javax.annotation.Resource;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ThreadPoolExecutor;
 
@@ -19,7 +19,7 @@ import java.util.concurrent.ThreadPoolExecutor;
  */
 @Configuration
 @EnableAsync
-public class ThreadPoolConfig implements AsyncConfigurer{
+public class ThreadPoolConfig implements AsyncConfigurer, SecureInvokeConfigurer {
 
     /**
      * 项目通用线程池
@@ -36,6 +36,15 @@ public class ThreadPoolConfig implements AsyncConfigurer{
      */
     @Override
     public Executor getAsyncExecutor() {
+        return hichatExecutor();
+    }
+
+    /**
+     * 注入默认的@SecureInvoke使用的线程池
+     * @return {@link Executor }
+     */
+    @Override
+    public Executor getSecureInvokeExecutor() {
         return hichatExecutor();
     }
 
