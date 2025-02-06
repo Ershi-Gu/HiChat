@@ -1,5 +1,6 @@
 package com.ershi.hichat.common.chat.domain.vo.request;
 
+import com.ershi.hichat.common.chat.domain.enums.MessageTypeEnum;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -23,6 +24,10 @@ public class ChatMessageReq {
     @ApiModelProperty("房间id")
     private Long roomId;
 
+
+    /**
+     * @see MessageTypeEnum
+     */
     @ApiModelProperty("消息类型")
     @NotNull
     private Integer msgType;

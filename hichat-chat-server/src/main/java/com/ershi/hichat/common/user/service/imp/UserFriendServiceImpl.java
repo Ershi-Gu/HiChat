@@ -3,8 +3,9 @@ package com.ershi.hichat.common.user.service.imp;
 import cn.hutool.core.collection.CollectionUtil;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.ershi.hichat.common.chat.domain.entity.RoomFriend;
+import com.ershi.hichat.common.chat.service.ChatService;
 import com.ershi.hichat.common.chat.service.RoomFriendService;
-import com.ershi.hichat.common.chat.service.RoomService;
+import com.ershi.hichat.common.chat.service.adapter.MessageAdapter;
 import com.ershi.hichat.common.common.annotation.RedissonLock;
 import com.ershi.hichat.common.common.event.UserApplyEvent;
 import com.ershi.hichat.common.common.utils.AssertUtil;
@@ -65,6 +66,9 @@ public class UserFriendServiceImpl implements UserFriendService {
 
     @Autowired
     private RoomFriendService roomFriendService;
+
+    @Autowired
+    private ChatService chatService;
 
     /**
      * 批量检查目标对象是否是自己好友
@@ -156,7 +160,8 @@ public class UserFriendServiceImpl implements UserFriendService {
         createFriend(uid, userApply.getUid());
         // 创建一个聊天房间
         RoomFriend roomFriend = roomFriendService.createFriendRoom(Arrays.asList(uid, userApply.getUid()));
-        // todo 发送一条同意消息。。我们已经是好友了，开始聊天吧
+        // 发送一条同意消息。。我们已经是好友了，开始聊天吧
+        chatService.sendMsg(MessageAdapter.buildFriendAgreeMsg(roomFriend.getRoomId()), uid);
     }
 
     /**
