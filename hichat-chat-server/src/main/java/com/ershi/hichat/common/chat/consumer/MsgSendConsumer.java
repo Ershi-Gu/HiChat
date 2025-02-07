@@ -72,9 +72,14 @@ public class MsgSendConsumer implements RocketMQListener<MsgSendMessageDTO> {
         if (room.isHotRoom()) { // 热门群聊额外使用Redis存储更新时间，这样在热点消息聚合时，直接去Redis即可拿到最新消息
             // 更新热门群聊时间-redis
             hotRoomCache.refreshActiveTime(room.getId(), message.getCreateTime());
-            // 推送给人们群聊中的指定用户
-            List<Long> memberUidList = getMemberUidList(room);
-            pushService.sendPushMsg(WSAdapter.buildMsgSend(msgResp), memberUidList);
+            // 判断是否是全员群
+            if (room.isAllRoom()) {
+                pushService.sendPushMsg(WSAdapter.buildMsgSend(msgResp));
+            } else {
+                // 推送给人们群聊中的指定用户
+                List<Long> memberUidList = getMemberUidList(room);
+                pushService.sendPushMsg(WSAdapter.buildMsgSend(msgResp), memberUidList);
+            }
         } else {
             List<Long> memberUidList = new ArrayList<>();
             if (Objects.equals(room.getType(), RoomTypeEnum.GROUP.getType())) {//普通群聊推送所有群成员

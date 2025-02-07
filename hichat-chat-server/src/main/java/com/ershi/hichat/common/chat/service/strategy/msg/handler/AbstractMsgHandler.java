@@ -5,7 +5,7 @@ import com.ershi.hichat.common.chat.dao.MessageDao;
 import com.ershi.hichat.common.chat.domain.entity.Message;
 import com.ershi.hichat.common.chat.domain.entity.msg.BaseMsgDTO;
 import com.ershi.hichat.common.chat.domain.enums.MessageTypeEnum;
-import com.ershi.hichat.common.chat.domain.vo.request.ChatMessageReq;
+import com.ershi.hichat.common.chat.domain.vo.request.msg.ChatMessageReq;
 import com.ershi.hichat.common.chat.service.adapter.MessageAdapter;
 import com.ershi.hichat.common.chat.service.strategy.msg.MsgHandlerFactory;
 import com.ershi.hichat.common.common.utils.AssertUtil;
