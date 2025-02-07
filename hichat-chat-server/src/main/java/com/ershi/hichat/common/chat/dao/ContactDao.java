@@ -1,8 +1,8 @@
 package com.ershi.hichat.common.chat.dao;
 
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.ershi.hichat.common.chat.domain.entity.Contact;
 import com.ershi.hichat.common.chat.mapper.ContactMapper;
-import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.stereotype.Service;
 
 /**
@@ -16,4 +16,17 @@ import org.springframework.stereotype.Service;
 @Service
 public class ContactDao extends ServiceImpl<ContactMapper, Contact> {
 
+    /**
+     * 获取用户在指定房间最后一条读取到的消息
+     *
+     * @param roomId
+     * @param receiveUid
+     * @return {@link Contact }
+     */
+    public Contact get(Long roomId, Long receiveUid) {
+        return lambdaQuery()
+                .eq(Contact::getRoomId, roomId)
+                .eq(Contact::getUid, receiveUid)
+                .one();
+    }
 }
