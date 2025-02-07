@@ -13,10 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -113,5 +110,34 @@ public class UserInfoCache extends AbstractRedisStringCache<Long, User> {
     public boolean isOnline(Long uid) {
         String onlineKey = RedisKey.getKey(RedisKey.ONLINE_UID_ZET);
         return RedisUtils.zIsMember(onlineKey, uid);
+    }
+
+    /**
+     * 用户下线
+     *
+     * @param uid
+     * @param lastOptTime
+     */
+    public void offline(Long uid, Date lastOptTime) {
+        String onlineKey = RedisKey.getKey(RedisKey.ONLINE_UID_ZET);
+        String offlineKey = RedisKey.getKey(RedisKey.OFFLINE_UID_ZET);
+        // 移除上线表
+        RedisUtils.zRemove(onlineKey, uid);
+        // 更新离线表
+        RedisUtils.zAdd(offlineKey, uid, lastOptTime.getTime());
+    }
+
+    /**
+     * 用户上线
+     * @param uid
+     * @param lastOptTime
+     */
+    public void online(Long uid, Date lastOptTime) {
+        String onlineKey = RedisKey.getKey(RedisKey.ONLINE_UID_ZET);
+        String offlineKey = RedisKey.getKey(RedisKey.OFFLINE_UID_ZET);
+        // 移除离线表
+        RedisUtils.zRemove(offlineKey, uid);
+        // 更新上线表
+        RedisUtils.zAdd(onlineKey, uid, lastOptTime.getTime());
     }
 }

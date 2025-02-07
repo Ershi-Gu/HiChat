@@ -5,16 +5,16 @@ import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.RandomUtil;
 import cn.hutool.json.JSONUtil;
 import com.ershi.hichat.common.common.config.ThreadPoolConfig;
+import com.ershi.hichat.common.common.event.UserOfflineEvent;
 import com.ershi.hichat.common.common.event.UserOnlineEvent;
 import com.ershi.hichat.common.user.dao.UserDao;
 import com.ershi.hichat.common.user.domain.entity.User;
 import com.ershi.hichat.common.user.domain.enums.ChatActiveStatusEnum;
-import com.ershi.hichat.common.user.service.cache.UserInfoCache;
-import com.ershi.hichat.common.user.service.cache.UserLoginCache;
-import com.ershi.hichat.common.websocket.domain.vo.response.WSBaseResp;
 import com.ershi.hichat.common.user.service.LoginService;
 import com.ershi.hichat.common.user.service.UserRoleService;
+import com.ershi.hichat.common.user.service.cache.UserInfoCache;
 import com.ershi.hichat.common.websocket.domain.dto.WSChannelExtraDTO;
+import com.ershi.hichat.common.websocket.domain.vo.response.WSBaseResp;
 import com.ershi.hichat.common.websocket.service.WebSocketService;
 import com.ershi.hichat.common.websocket.service.adapter.WebSocketAdapter;
 import com.ershi.hichat.common.websocket.utils.NettyUtil;
@@ -175,7 +175,7 @@ public class WebSocketServiceImpl implements WebSocketService {
             User user = new User();
             user.setId(uidOptional.get());
             user.setLastOptTime(new Date());
-            // todo 发出用户下线通知
+            applicationEventPublisher.publishEvent(new UserOfflineEvent(this, user));
         }
     }
 
