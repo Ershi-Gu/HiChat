@@ -1,19 +1,18 @@
 package com.ershi.hichat.common.chat.controller;
 
 
-import com.ershi.hichat.common.chat.domain.vo.request.ChatMessageReq;
+import com.ershi.hichat.common.chat.domain.vo.request.msg.ChatMessagePageReq;
+import com.ershi.hichat.common.chat.domain.vo.request.msg.ChatMessageReq;
 import com.ershi.hichat.common.chat.domain.vo.response.ChatMessageResp;
 import com.ershi.hichat.common.chat.service.ChatService;
 import com.ershi.hichat.common.common.domain.vo.ApiResult;
 import com.ershi.hichat.common.common.utils.RequestHolder;
+import com.ershi.hichat.common.domain.vo.response.CursorPageBaseResp;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 
@@ -37,5 +36,15 @@ public class ChatController {
         Long msgId = chatService.sendMsg(chatMessageReq, RequestHolder.get().getUid());
         // 封装完整的消息展示格式，方便前端直接获取，不用等待websocket重新推送
         return ApiResult.success(chatService.getMsgResp(msgId, RequestHolder.get().getUid()));
+    }
+
+    @GetMapping("/public/msg/page")
+    @ApiOperation("消息列表")
+    public ApiResult<CursorPageBaseResp<ChatMessageResp>> getMsgPage(@Valid ChatMessagePageReq chatMessagePageReq) {
+        // 获取消息列表数据
+        CursorPageBaseResp<ChatMessageResp> msgPage = chatService.getMsgPage(chatMessagePageReq, RequestHolder.get().getUid());
+        // 过滤掉黑名单用户发送的消息 -> 主要是防止黑名单更新不及时
+        chatService.filterBlackMsg(msgPage);
+        return ApiResult.success(msgPage);
     }
 }

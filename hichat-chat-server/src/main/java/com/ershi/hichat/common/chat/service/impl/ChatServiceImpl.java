@@ -2,12 +2,14 @@ package com.ershi.hichat.common.chat.service.impl;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.CollectionUtil;
+import com.ershi.hichat.common.chat.dao.ContactDao;
 import com.ershi.hichat.common.chat.dao.GroupMemberDao;
 import com.ershi.hichat.common.chat.dao.MessageDao;
 import com.ershi.hichat.common.chat.dao.RoomFriendDao;
 import com.ershi.hichat.common.chat.domain.entity.*;
 import com.ershi.hichat.common.chat.domain.enums.RoomStatusEnum;
-import com.ershi.hichat.common.chat.domain.vo.request.ChatMessageReq;
+import com.ershi.hichat.common.chat.domain.vo.request.msg.ChatMessagePageReq;
+import com.ershi.hichat.common.chat.domain.vo.request.msg.ChatMessageReq;
 import com.ershi.hichat.common.chat.domain.vo.response.ChatMessageResp;
 import com.ershi.hichat.common.chat.service.ChatService;
 import com.ershi.hichat.common.chat.service.adapter.MessageAdapter;
@@ -17,15 +19,15 @@ import com.ershi.hichat.common.chat.service.strategy.msg.MsgHandlerFactory;
 import com.ershi.hichat.common.chat.service.strategy.msg.handler.AbstractMsgHandler;
 import com.ershi.hichat.common.common.event.MessageSendEvent;
 import com.ershi.hichat.common.common.utils.AssertUtil;
+import com.ershi.hichat.common.domain.vo.response.CursorPageBaseResp;
+import com.ershi.hichat.common.user.domain.enums.BlackTypeEnum;
+import com.ershi.hichat.common.user.service.cache.UserInfoCache;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.stream.Collectors;
+import java.util.*;
 
 /**
  * @author Ershi
@@ -39,6 +41,9 @@ public class ChatServiceImpl implements  ChatService {
 
     @Autowired
     private RoomGroupCache roomGroupCache;
+    
+    @Autowired
+    private UserInfoCache userInfoCache;
 
     @Autowired
     private RoomFriendDao roomFriendDao;
@@ -48,6 +53,9 @@ public class ChatServiceImpl implements  ChatService {
 
     @Autowired
     private MessageDao messageDao;
+
+    @Autowired
+    private ContactDao contactDao;
 
     @Autowired
     private ApplicationEventPublisher applicationEventPublisher;
@@ -126,6 +134,58 @@ public class ChatServiceImpl implements  ChatService {
         if (CollectionUtil.isEmpty(messages)) {
             return new ArrayList<>();
         }
+        // todo 查询消息标记
         return MessageAdapter.buildMsgResp(messages, receiveUid);
+    }
+
+    /**
+     * 获取消息列表
+     *
+     * @param chatMessagePageReq
+     * @param receiveUid
+     * @return {@link CursorPageBaseResp }<{@link ChatMessageResp }>
+     */
+    @Override
+    public CursorPageBaseResp<ChatMessageResp> getMsgPage(ChatMessagePageReq chatMessagePageReq, Long receiveUid) {
+        // 用用户收件箱最后一条消息id，来限制被踢出的人能看见的最后消息
+        Long lastMsgId = getLastMsgId(chatMessagePageReq.getRoomId(), receiveUid);
+        // 获取游标翻页消息列表
+        CursorPageBaseResp<Message> cursorPage =
+                messageDao.getCursorPage(chatMessagePageReq.getRoomId(), chatMessagePageReq, lastMsgId);
+        // 如果查询不到就返回空对象
+        if (cursorPage.isEmpty()) {
+            return CursorPageBaseResp.empty();
+        }
+        // 组装消息分页返回
+        return CursorPageBaseResp.init(cursorPage, getMsgRespBatch(cursorPage.getList(), receiveUid));
+    }
+
+    /**
+     * 获取用户在该房间收到的最后一条消息id
+     * @param roomId
+     * @param receiveUid
+     * @return {@link Long }
+     */
+    private Long getLastMsgId(Long roomId, Long receiveUid) {
+        Room room = roomCache.get(roomId);
+        AssertUtil.isNotEmpty(room, "房间号输入错误");
+        // 判断是否是全员群，全员群不做限制
+        if(room.isAllRoom()) {
+            return null;
+        }
+        AssertUtil.isNotEmpty(receiveUid, "请先登录");
+        // 从成员收件箱里面获取该房间该成员读取到的最后一条消息
+        Contact contact = contactDao.get(room.getId(), receiveUid);
+        return contact.getReadMsgId();
+    }
+
+    /**
+     * 过滤掉拉黑用户的信息
+     * @param memberPage
+     */
+    @Override
+    public void filterBlackMsg(CursorPageBaseResp<ChatMessageResp> memberPage) {
+        Set<String> blackMembers = userInfoCache.getBlackMap().getOrDefault(BlackTypeEnum.UID.getType(), new HashSet<>());
+        memberPage.getList().removeIf(member -> blackMembers.contains(member.getFromUser().getUid().toString()));
     }
 }
