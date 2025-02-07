@@ -1,4 +1,4 @@
-package com.ershi.hichat.common.chat.domain.vo.request;
+package com.ershi.hichat.common.chat.domain.vo.request.msg;
 
 import com.ershi.hichat.common.chat.domain.enums.MessageTypeEnum;
 import io.swagger.annotations.ApiModelProperty;

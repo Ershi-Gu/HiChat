@@ -17,6 +17,8 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 @Getter
 public enum RoomTypeEnum {
+
+    ALL(0, "全员群"),
     GROUP(1, "群聊"),
     FRIEND(2, "单聊"),
     ;

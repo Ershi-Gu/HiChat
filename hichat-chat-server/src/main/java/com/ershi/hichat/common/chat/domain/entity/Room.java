@@ -103,4 +103,13 @@ public class Room implements Serializable {
     public boolean isHotRoom() {
         return HotFlagEnum.of(this.hotFlag) == HotFlagEnum.YES;
     }
+
+    /**
+     * 判断是否是全员群
+     * @return boolean
+     */
+    @JsonIgnore
+    public boolean isAllRoom() {
+        return RoomTypeEnum.of(this.type) == RoomTypeEnum.ALL;
+    }
 }
