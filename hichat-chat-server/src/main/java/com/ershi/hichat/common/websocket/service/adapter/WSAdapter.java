@@ -1,6 +1,7 @@
 package com.ershi.hichat.common.websocket.service.adapter;
 
 import com.ershi.hichat.common.chat.domain.vo.response.ChatMessageResp;
+import com.ershi.hichat.common.user.domain.entity.User;
 import com.ershi.hichat.common.websocket.domain.enums.WSRespTypeEnum;
 import com.ershi.hichat.common.websocket.domain.vo.response.WSBaseResp;
 import com.ershi.hichat.common.websocket.domain.vo.response.dataclass.WSFriendApply;
@@ -37,5 +38,23 @@ public class WSAdapter {
         wsBaseResp.setType(WSRespTypeEnum.APPLY.getType());
         wsBaseResp.setData(wsFriendApply);
         return wsBaseResp;
+    }
+
+    /**
+     * 构建用户下线通知
+     * @param user
+     * @return {@link WSBaseResp }<{@link ? }>
+     */
+    public static WSBaseResp<?> buildOfflineNotifyResp(User user) {
+        return null;
+    }
+
+    /**
+     * 构建用户上线通知
+     * @param user
+     * @return {@link WSBaseResp }<{@link ? }>
+     */
+    public static WSBaseResp<?> buildOnlineNotifyResp(User user) {
+        return null;
     }
 }
