@@ -1,5 +1,6 @@
 package com.ershi.hichat.common.chat.service.strategy.msg.handler.type;
 
+import com.ershi.hichat.common.chat.constant.MsgReplyContent;
 import com.ershi.hichat.common.chat.dao.MessageDao;
 import com.ershi.hichat.common.chat.domain.entity.Message;
 import com.ershi.hichat.common.chat.domain.entity.msg.BaseMsgDTO;
@@ -55,6 +56,11 @@ public class RecallMsgHandler extends AbstractMsgHandler<TextMsgDTO> {
             return TextMsgDTO.builder().content("管理员\"" + userInfo.getName() + "\"撤回了一条成员消息").build();
         }
         return TextMsgDTO.builder().content("\"" + userInfo.getName() + "\"撤回了一条消息").build();
+    }
+
+    @Override
+    public Object showReplyMsg(Message replyMessage) {
+        return MsgReplyContent.RECALL_REPLY_CONTENT;
     }
 
 

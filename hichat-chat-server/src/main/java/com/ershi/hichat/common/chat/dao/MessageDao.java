@@ -37,4 +37,20 @@ public class MessageDao extends ServiceImpl<MessageMapper, Message> {
             wrapper.le(Objects.nonNull(lastMsgId), Message::getId, lastMsgId);
         },Message::getId);
     }
+
+    /**
+     * 与回复消息之间相差的条数
+     *
+     * @param roomId
+     * @param msgId
+     * @param replyMsgId
+     * @return {@link Integer } 计算出的结果为当前房间 msgId 到 replyMsgId 之间的条数，包括 replyMsgId 本身
+     */
+    public Integer getGapCount(Long roomId, Long msgId, Long replyMsgId) {
+        return lambdaQuery()
+                .eq(Message::getRoomId, roomId)
+                .gt(Message::getId, replyMsgId)
+                .le(Message::getId, msgId)
+                .count();
+    }
 }

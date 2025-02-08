@@ -32,6 +32,9 @@ public class TextMsgDTO implements BaseMsgDTO, Serializable {
     @ApiModelProperty("回复的消息id，没有就不传")
     private Long replyMsgId;
 
+    @ApiModelProperty("与回复消息之间相差的条数")
+    private Integer gapCountToReply;
+
     @ApiModelProperty("艾特的uid，如果是全体艾特传 0")
     @Size(max = 10, message = "一次最多艾特10人哦")
     private List<Long> atUidList;

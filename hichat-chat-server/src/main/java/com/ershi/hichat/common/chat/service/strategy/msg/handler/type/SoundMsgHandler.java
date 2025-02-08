@@ -1,5 +1,6 @@
 package com.ershi.hichat.common.chat.service.strategy.msg.handler.type;
 
+import com.ershi.hichat.common.chat.constant.MsgReplyContent;
 import com.ershi.hichat.common.chat.dao.MessageDao;
 import com.ershi.hichat.common.chat.domain.entity.Message;
 import com.ershi.hichat.common.chat.domain.entity.msg.BaseMsgDTO;
@@ -43,5 +44,10 @@ public class SoundMsgHandler extends AbstractMsgHandler<SoundMsgDTO> {
     @Override
     public BaseMsgDTO showMsg(Message msg) {
         return msg.getExtra().getSoundMsgDTO();
+    }
+
+    @Override
+    public Object showReplyMsg(Message replyMessage) {
+        return MsgReplyContent.SOUND_REPLY_CONTENT;
     }
 }
