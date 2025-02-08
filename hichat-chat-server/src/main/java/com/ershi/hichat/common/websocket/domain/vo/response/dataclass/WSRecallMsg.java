@@ -1,5 +1,6 @@
 package com.ershi.hichat.common.websocket.domain.vo.response.dataclass;
 
+import com.ershi.hichat.common.chat.domain.dto.ChatMsgRecallDTO;
 import lombok.Data;
 
 /**
@@ -8,5 +9,5 @@ import lombok.Data;
  * @date 2024/11/24
  */
 @Data
-public class WSMsgRecall{
+public class WSRecallMsg extends ChatMsgRecallDTO {
 }

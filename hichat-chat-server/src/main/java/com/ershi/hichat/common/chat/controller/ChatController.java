@@ -2,6 +2,7 @@ package com.ershi.hichat.common.chat.controller;
 
 
 import com.ershi.hichat.common.chat.domain.vo.request.msg.ChatMessagePageReq;
+import com.ershi.hichat.common.chat.domain.vo.request.msg.ChatMessageRecallReq;
 import com.ershi.hichat.common.chat.domain.vo.request.msg.ChatMessageReq;
 import com.ershi.hichat.common.chat.domain.vo.response.ChatMessageResp;
 import com.ershi.hichat.common.chat.service.ChatService;
@@ -46,5 +47,12 @@ public class ChatController {
         // 过滤掉黑名单用户发送的消息 -> 主要是防止黑名单更新不及时
         chatService.filterBlackMsg(msgPage);
         return ApiResult.success(msgPage);
+    }
+
+    @PutMapping("/msg/recall")
+    @ApiOperation("撤回消息")
+    public ApiResult<Void> recallMsg(@Valid @RequestBody ChatMessageRecallReq chatMessageRecallReq) {
+        chatService.recallMsg(RequestHolder.get().getUid(), chatMessageRecallReq);
+        return ApiResult.success();
     }
 }
