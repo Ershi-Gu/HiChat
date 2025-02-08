@@ -1,5 +1,6 @@
 package com.ershi.hichat.common.chat.service.strategy.msg.handler.type;
 
+import com.ershi.hichat.common.chat.constant.MsgReplyContent;
 import com.ershi.hichat.common.chat.dao.MessageDao;
 import com.ershi.hichat.common.chat.domain.entity.Message;
 import com.ershi.hichat.common.chat.domain.entity.msg.BaseMsgDTO;
@@ -46,5 +47,10 @@ public class VideoMsgHandler extends AbstractMsgHandler<VideoMsgDTO> {
     @Override
     public BaseMsgDTO showMsg(Message msg) {
         return msg.getExtra().getVideoMsgDTO();
+    }
+
+    @Override
+    public Object showReplyMsg(Message replyMessage) {
+        return MsgReplyContent.VIDEO_REPLY_CONTENT;
     }
 }

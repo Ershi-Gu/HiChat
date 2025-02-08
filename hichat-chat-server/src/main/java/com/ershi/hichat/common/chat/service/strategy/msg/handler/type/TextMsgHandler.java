@@ -8,8 +8,11 @@ import com.ershi.hichat.common.chat.domain.entity.RoomGroup;
 import com.ershi.hichat.common.chat.domain.entity.msg.BaseMsgDTO;
 import com.ershi.hichat.common.chat.domain.entity.msg.MessageExtra;
 import com.ershi.hichat.common.chat.domain.entity.msg.type.TextMsgDTO;
+import com.ershi.hichat.common.chat.domain.enums.MessageStatusEnum;
 import com.ershi.hichat.common.chat.domain.enums.MessageTypeEnum;
+import com.ershi.hichat.common.chat.domain.vo.response.msg.TextMsgResp;
 import com.ershi.hichat.common.chat.service.RoomGroupService;
+import com.ershi.hichat.common.chat.service.adapter.MessageAdapter;
 import com.ershi.hichat.common.chat.service.strategy.msg.handler.AbstractMsgHandler;
 import com.ershi.hichat.common.common.exception.BusinessException;
 import com.ershi.hichat.common.common.utils.AssertUtil;
@@ -27,6 +30,7 @@ import java.util.stream.Collectors;
 
 /**
  * 文本消息处理器
+ *
  * @author Ershi
  * @date 2025/01/15
  */
@@ -46,15 +50,15 @@ public class TextMsgHandler extends AbstractMsgHandler<TextMsgDTO> {
 
     /**
      * 文本消息合法性检查
+     *
      * @param messageBody
      * @param roomId
      * @param uid
      */
     @Override
     protected void checkMsg(TextMsgDTO messageBody, Long roomId, Long uid) {
-        // todo 回复消息校验
         // 如果是回复消息，校验回复消息是否存在以及合法性
-//        checkReplyMsg(messageBody, roomId);
+        checkReplyMsg(messageBody, roomId);
         // todo 艾特用户校验
         // 如果有艾特用户，需要校验艾特合法性
 //        checkAtMsg(messageBody, roomId, uid);
@@ -62,6 +66,7 @@ public class TextMsgHandler extends AbstractMsgHandler<TextMsgDTO> {
 
     /**
      * 检查消息回复操作的合法性
+     *
      * @param messageBody
      * @param roomId
      */
@@ -75,6 +80,7 @@ public class TextMsgHandler extends AbstractMsgHandler<TextMsgDTO> {
 
     /**
      * 艾特用户操作合法性校验
+     *
      * @param messageBody
      * @param roomId
      * @param uid
@@ -87,7 +93,7 @@ public class TextMsgHandler extends AbstractMsgHandler<TextMsgDTO> {
             // 校验艾特的用户是否错在
             // 如果艾特用户不存在，userInfoCache返回的map中依然存在该key，但是value为null，需要过滤掉再校验
             long batchCount = userMap.values().stream().filter(Objects::nonNull).count();
-            AssertUtil.equal((long)atUidList.size(), batchCount, "@用户不存在");
+            AssertUtil.equal((long) atUidList.size(), batchCount, "@用户不存在");
             // 检查是否是艾特全体成员
             boolean atAll = messageBody.getAtUidList().contains(0L);
             if (atAll) { // 若是则判断用户在该群聊中的权限
@@ -104,16 +110,44 @@ public class TextMsgHandler extends AbstractMsgHandler<TextMsgDTO> {
      */
     @Override
     public void saveMsg(Message msg, TextMsgDTO textMsgDTO) {
+        // 保存消息内容
         MessageExtra extra = Optional.ofNullable(msg.getExtra()).orElse(new MessageExtra());
         Message update = new Message();
         update.setId(msg.getId());
         update.setExtra(extra);
         extra.setTextMsgDTO(textMsgDTO);
+        // 判断是否是回复消息，若是则计算出与回复消息相差条数
+        if (Objects.nonNull(textMsgDTO.getReplyMsgId())) {
+            Integer gapCountToReply = messageDao.getGapCount(msg.getRoomId(), msg.getId(), textMsgDTO.getReplyMsgId());
+            textMsgDTO.setGapCountToReply(gapCountToReply);
+        }
         messageDao.updateById(update);
     }
 
     @Override
     public BaseMsgDTO showMsg(Message msg) {
-        return msg.getExtra().getTextMsgDTO();
+        // 构建文本消息返回体
+        TextMsgDTO textMsgDTO = msg.getExtra().getTextMsgDTO();
+        TextMsgResp textMsgResp = TextMsgResp.builder()
+                .content(textMsgDTO.getContent())
+                .build();
+        // 回复消息的展示
+        // 1. 获取回复的那条消息
+        Optional<Message> reply = Optional.ofNullable(textMsgDTO.getReplyMsgId())
+                .map(messageDao::getById)
+                .filter(a -> Objects.equals(a.getStatus(), MessageStatusEnum.NORMAL.getStatus()));
+        if (!reply.isPresent()) {
+            return textMsgResp;
+        }
+        // 2. 如果回复消息存在，组装回复消息
+        Message replyMessage = reply.get();
+        User replyUserInfo = userInfoCache.get(replyMessage.getFromUid());
+        textMsgResp.setReply(MessageAdapter.buildReplyMessage(textMsgDTO, replyMessage, replyUserInfo));
+        return textMsgResp;
+    }
+
+    @Override
+    public Object showReplyMsg(Message replyMessage) {
+        return replyMessage.getExtra().getTextMsgDTO().getContent();
     }
 }

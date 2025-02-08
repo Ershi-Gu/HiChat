@@ -73,6 +73,12 @@ public abstract class AbstractMsgHandler <Req>{
      */
     public abstract BaseMsgDTO showMsg(Message msg);
 
+    /**
+     * 当消息被回复时展示形态
+     * @param replyMessage
+     */
+    public abstract Object showReplyMsg(Message replyMessage);
+
 
     /**
      * 检查消息合法性，并持久化消息到服务器
