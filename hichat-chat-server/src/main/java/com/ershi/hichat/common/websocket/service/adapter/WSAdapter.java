@@ -1,10 +1,13 @@
 package com.ershi.hichat.common.websocket.service.adapter;
 
+import com.ershi.hichat.common.chat.domain.dto.ChatMsgRecallDTO;
 import com.ershi.hichat.common.chat.domain.vo.response.ChatMessageResp;
 import com.ershi.hichat.common.user.domain.entity.User;
 import com.ershi.hichat.common.websocket.domain.enums.WSRespTypeEnum;
 import com.ershi.hichat.common.websocket.domain.vo.response.WSBaseResp;
 import com.ershi.hichat.common.websocket.domain.vo.response.dataclass.WSFriendApply;
+import com.ershi.hichat.common.websocket.domain.vo.response.dataclass.WSRecallMsg;
+import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Component;
 
 /**
@@ -56,5 +59,20 @@ public class WSAdapter {
      */
     public static WSBaseResp<?> buildOnlineNotifyResp(User user) {
         return null;
+    }
+
+    /**
+     * 构建消息撤回的推送
+     *
+     * @param chatMsgRecallDTO
+     * @return {@link WSBaseResp }<{@link ? }>
+     */
+    public static WSBaseResp<?> buildMsgRecall(ChatMsgRecallDTO chatMsgRecallDTO) {
+        WSBaseResp<WSRecallMsg> wsBaseResp = new WSBaseResp<>();
+        wsBaseResp.setType(WSRespTypeEnum.RECALL.getType());
+        WSRecallMsg recall = new WSRecallMsg();
+        BeanUtils.copyProperties(chatMsgRecallDTO, recall);
+        wsBaseResp.setData(recall);
+        return wsBaseResp;
     }
 }

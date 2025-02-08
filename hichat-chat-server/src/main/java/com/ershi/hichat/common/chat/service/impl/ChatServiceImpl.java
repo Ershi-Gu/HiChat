@@ -2,13 +2,18 @@ package com.ershi.hichat.common.chat.service.impl;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.CollectionUtil;
+import cn.hutool.core.date.DateUnit;
+import cn.hutool.core.date.DateUtil;
 import com.ershi.hichat.common.chat.dao.ContactDao;
 import com.ershi.hichat.common.chat.dao.GroupMemberDao;
 import com.ershi.hichat.common.chat.dao.MessageDao;
 import com.ershi.hichat.common.chat.dao.RoomFriendDao;
+import com.ershi.hichat.common.chat.domain.dto.ChatMsgRecallDTO;
 import com.ershi.hichat.common.chat.domain.entity.*;
+import com.ershi.hichat.common.chat.domain.enums.MessageTypeEnum;
 import com.ershi.hichat.common.chat.domain.enums.RoomStatusEnum;
 import com.ershi.hichat.common.chat.domain.vo.request.msg.ChatMessagePageReq;
+import com.ershi.hichat.common.chat.domain.vo.request.msg.ChatMessageRecallReq;
 import com.ershi.hichat.common.chat.domain.vo.request.msg.ChatMessageReq;
 import com.ershi.hichat.common.chat.domain.vo.response.ChatMessageResp;
 import com.ershi.hichat.common.chat.service.ChatService;
@@ -17,10 +22,14 @@ import com.ershi.hichat.common.chat.service.cache.RoomCache;
 import com.ershi.hichat.common.chat.service.cache.RoomGroupCache;
 import com.ershi.hichat.common.chat.service.strategy.msg.MsgHandlerFactory;
 import com.ershi.hichat.common.chat.service.strategy.msg.handler.AbstractMsgHandler;
+import com.ershi.hichat.common.chat.service.strategy.msg.handler.type.RecallMsgHandler;
+import com.ershi.hichat.common.common.event.MessageRecallEvent;
 import com.ershi.hichat.common.common.event.MessageSendEvent;
 import com.ershi.hichat.common.common.utils.AssertUtil;
 import com.ershi.hichat.common.domain.vo.response.CursorPageBaseResp;
 import com.ershi.hichat.common.user.domain.enums.BlackTypeEnum;
+import com.ershi.hichat.common.user.domain.enums.RoleEnum;
+import com.ershi.hichat.common.user.service.UserRoleService;
 import com.ershi.hichat.common.user.service.cache.UserInfoCache;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
@@ -56,6 +65,12 @@ public class ChatServiceImpl implements  ChatService {
 
     @Autowired
     private ContactDao contactDao;
+
+    @Autowired
+    private UserRoleService userRoleService;
+
+    @Autowired
+    private RecallMsgHandler recallMsgHandler;
 
     @Autowired
     private ApplicationEventPublisher applicationEventPublisher;
@@ -187,5 +202,48 @@ public class ChatServiceImpl implements  ChatService {
     public void filterBlackMsg(CursorPageBaseResp<ChatMessageResp> memberPage) {
         Set<String> blackMembers = userInfoCache.getBlackMap().getOrDefault(BlackTypeEnum.UID.getType(), new HashSet<>());
         memberPage.getList().removeIf(member -> blackMembers.contains(member.getFromUser().getUid().toString()));
+    }
+
+    /**
+     * 撤回消息
+     * @param uid
+     * @param chatMessageRecallReq
+     */
+    @Override
+    public void recallMsg(Long uid, ChatMessageRecallReq chatMessageRecallReq) {
+        // 获取需要撤回的消息
+        Message message = messageDao.getById(chatMessageRecallReq.getMsgId());
+        // 校验撤回合法性
+        checkRecall(uid, message);
+        // 执行消息撤回
+        recallMsgHandler.recall(uid, message);
+        // 推送撤回事件
+        ChatMsgRecallDTO chatMsgRecallDTO = ChatMsgRecallDTO.builder()
+                .msgId(message.getId())
+                .roomId(message.getRoomId())
+                .recallUid(uid).build();
+        applicationEventPublisher.publishEvent(new MessageRecallEvent(this, chatMsgRecallDTO));
+    }
+
+    /**
+     * 撤回消息合法性校验
+     * @param uid
+     * @param message
+     */
+    private void checkRecall(Long uid, Message message) {
+        AssertUtil.isNotEmpty(message, "消息不存在");
+        AssertUtil.notEqual(message.getType(), MessageTypeEnum.RECALL.getType(), "撤回的消息不能再撤回了哦");
+        // 超管可以撤回所有人消息
+        boolean isAdmin = userRoleService.checkAuth(uid, RoleEnum.ADMIN);
+        if (isAdmin) {
+            return;
+        }
+        // todo 判断是否是该房间管理员，是则有权限撤回
+        // 判断是否是消息发送者本人
+        boolean isSelf = Objects.equals(uid, message.getFromUid());
+        AssertUtil.isTrue(isSelf, "撤回失败，您不是该消息的发送者哦");
+        // 判断消息是否超过两分钟
+        long between = DateUtil.between(message.getCreateTime(), new Date(), DateUnit.MINUTE);
+        AssertUtil.isTrue(between < 2, "超过2分钟的消息不能撤回哦");
     }
 }

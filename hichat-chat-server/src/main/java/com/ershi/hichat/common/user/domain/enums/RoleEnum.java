@@ -17,7 +17,7 @@ import java.util.stream.Collectors;
 @Getter
 public enum RoleEnum {
     ADMIN(1L, "超级管理员"),
-    CHAT_MANAGER(2L, "聊天管理员"),
+    CHAT_MANAGER(2L, "聊天管理员"), // todo 给user_role表加字段room，用于表示某个房间的聊天管理员
     ;
 
     private final Long id;

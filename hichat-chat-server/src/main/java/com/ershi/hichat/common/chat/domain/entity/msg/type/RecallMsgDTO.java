@@ -18,11 +18,11 @@ import java.util.Date;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class MsgRecallDTO implements BaseMsgDTO, Serializable {
+public class RecallMsgDTO implements BaseMsgDTO, Serializable {
     private static final long serialVersionUID = -5167216465097409286L;
 
     /**
-     * 撤回消息的uid
+     * 撤回消息人的uid
      */
     private Long recallUid;
     /**

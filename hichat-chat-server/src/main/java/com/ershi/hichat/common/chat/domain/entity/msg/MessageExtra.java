@@ -10,7 +10,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
-import java.util.List;
 import java.util.Map;
 
 
@@ -36,7 +35,7 @@ public class MessageExtra implements Serializable {
     /**
      * 消息撤回详情
      */
-    private MsgRecallDTO msgRecallDTO;
+    private RecallMsgDTO recallMsgDTO;
     /**
      * 文本消息
      */
