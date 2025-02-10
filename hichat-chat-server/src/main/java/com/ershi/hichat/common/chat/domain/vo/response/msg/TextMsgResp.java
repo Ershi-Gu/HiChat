@@ -1,6 +1,7 @@
 package com.ershi.hichat.common.chat.domain.vo.response.msg;
 
 import com.ershi.hichat.common.chat.domain.entity.msg.BaseMsgDTO;
+import com.ershi.hichat.common.common.utils.discover.domain.UrlAnalysisInfo;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -8,6 +9,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * 文本消息回复体
@@ -27,6 +29,9 @@ public class TextMsgResp implements BaseMsgDTO {
 
     @ApiModelProperty("回复的消息，如果没有回复的消息，返回的是null")
     private ReplyMsg reply;
+
+    @ApiModelProperty("消息链接映射")
+    private Map<String, UrlAnalysisInfo> urlContentMap;
 
     @Data
     @Builder

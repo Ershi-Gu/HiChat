@@ -28,6 +28,9 @@ import java.util.stream.Collectors;
  */
 public class MessageAdapter {
 
+    /**
+     * 用于判断消息回复是否可以跳转，最大支持100条间隔
+     */
     public static final int CAN_CALLBACK_GAP_COUNT = 100;
 
     /**

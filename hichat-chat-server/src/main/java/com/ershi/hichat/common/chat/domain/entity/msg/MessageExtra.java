@@ -29,11 +29,7 @@ public class MessageExtra implements Serializable {
     private static final long serialVersionUID = -8389910228294638090L;
 
     /**
-     * url跳转链接信息
-     */
-    private Map<String, UrlInfo> urlContentMap;
-    /**
-     * 消息撤回详情
+     * 撤回消息-也是一条消息
      */
     private RecallMsgDTO recallMsgDTO;
     /**

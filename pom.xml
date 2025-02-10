@@ -47,6 +47,8 @@
     <jwt.version>3.19.0</jwt.version>
     <ip2region.version>2.7.0</ip2region.version>
     <rocketmq-spring-boot-starter.version>2.2.2</rocketmq-spring-boot-starter.version>
+    <jsoup.version>1.15.3</jsoup.version>
+    <annotations.version>13.0</annotations.version>
   </properties>
 
   <!--依赖管理-->
@@ -156,6 +158,17 @@
         <groupId>org.apache.rocketmq</groupId>
         <artifactId>rocketmq-spring-boot-starter</artifactId>
         <version>${rocketmq-spring-boot-starter.version}</version>
+      </dependency>
+      <!--jsoup-->
+      <dependency>
+        <groupId>org.jsoup</groupId>
+        <artifactId>jsoup</artifactId>
+        <version>${jsoup.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.jetbrains</groupId>
+        <artifactId>annotations</artifactId>
+        <version>${annotations.version}</version>
       </dependency>
     </dependencies>
 

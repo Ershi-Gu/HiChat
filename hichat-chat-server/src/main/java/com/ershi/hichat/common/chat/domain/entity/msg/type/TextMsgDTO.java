@@ -1,6 +1,7 @@
 package com.ershi.hichat.common.chat.domain.entity.msg.type;
 
 import com.ershi.hichat.common.chat.domain.entity.msg.BaseMsgDTO;
+import com.ershi.hichat.common.common.utils.discover.domain.UrlAnalysisInfo;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -11,6 +12,7 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 import java.io.Serializable;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 文本消息参数
@@ -38,4 +40,7 @@ public class TextMsgDTO implements BaseMsgDTO, Serializable {
     @ApiModelProperty("艾特的uid，如果是全体艾特传 0")
     @Size(max = 10, message = "一次最多艾特10人哦")
     private List<Long> atUidList;
+
+    @ApiModelProperty("Url解析内容映射")
+    private Map<String, UrlAnalysisInfo> urlContentMap;
 }

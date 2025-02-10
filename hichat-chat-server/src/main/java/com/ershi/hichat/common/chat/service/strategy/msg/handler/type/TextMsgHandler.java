@@ -4,20 +4,18 @@ import cn.hutool.core.collection.CollectionUtil;
 
 import com.ershi.hichat.common.chat.dao.MessageDao;
 import com.ershi.hichat.common.chat.domain.entity.Message;
-import com.ershi.hichat.common.chat.domain.entity.RoomGroup;
 import com.ershi.hichat.common.chat.domain.entity.msg.BaseMsgDTO;
 import com.ershi.hichat.common.chat.domain.entity.msg.MessageExtra;
 import com.ershi.hichat.common.chat.domain.entity.msg.type.TextMsgDTO;
 import com.ershi.hichat.common.chat.domain.enums.MessageStatusEnum;
 import com.ershi.hichat.common.chat.domain.enums.MessageTypeEnum;
 import com.ershi.hichat.common.chat.domain.vo.response.msg.TextMsgResp;
-import com.ershi.hichat.common.chat.service.RoomGroupService;
 import com.ershi.hichat.common.chat.service.adapter.MessageAdapter;
 import com.ershi.hichat.common.chat.service.strategy.msg.handler.AbstractMsgHandler;
-import com.ershi.hichat.common.common.exception.BusinessException;
 import com.ershi.hichat.common.common.utils.AssertUtil;
+import com.ershi.hichat.common.common.utils.discover.PrioritizedUrlDiscover;
+import com.ershi.hichat.common.common.utils.discover.domain.UrlAnalysisInfo;
 import com.ershi.hichat.common.user.domain.entity.User;
-import com.ershi.hichat.common.user.domain.entity.UserRole;
 import com.ershi.hichat.common.user.domain.enums.RoleEnum;
 import com.ershi.hichat.common.user.service.UserRoleService;
 import com.ershi.hichat.common.user.service.cache.UserInfoCache;
@@ -48,6 +46,11 @@ public class TextMsgHandler extends AbstractMsgHandler<TextMsgDTO> {
 
     @Autowired
     private UserRoleService userRoleService;
+
+    /**
+     * URL解析器
+     */
+    private static final PrioritizedUrlDiscover URL_DISCOVER = new PrioritizedUrlDiscover();
 
     @Override
     protected MessageTypeEnum getMessageTypeEnum() {
@@ -124,13 +127,19 @@ public class TextMsgHandler extends AbstractMsgHandler<TextMsgDTO> {
         update.setId(msg.getId());
         update.setExtra(extra);
         extra.setTextMsgDTO(textMsgDTO);
-        // 判断是否是回复消息，若是则计算出与回复消息相差条数
+        // 判断是否是回复消息，若是则计算出与回复消息相差条数并存储
         if (Objects.nonNull(textMsgDTO.getReplyMsgId())) {
             Integer gapCountToReply = messageDao.getGapCount(msg.getRoomId(), msg.getId(), textMsgDTO.getReplyMsgId());
             textMsgDTO.setGapCountToReply(gapCountToReply);
         }
-        // 去重艾特的uid
-        textMsgDTO.setAtUidList(textMsgDTO.getAtUidList().stream().distinct().collect(Collectors.toList()));
+        // 存储去重艾特的uid
+        if (CollectionUtil.isNotEmpty(textMsgDTO.getAtUidList())) {
+            textMsgDTO.setAtUidList(textMsgDTO.getAtUidList().stream().distinct().collect(Collectors.toList()));
+        }
+        // 判断是否有url解析需求，若是则解析出来保存到DB
+        Map<String, UrlAnalysisInfo> urlInfoMap = URL_DISCOVER.getUrlInfoMap(textMsgDTO.getContent());
+        textMsgDTO.setUrlContentMap(urlInfoMap);
+        // 更新BD
         messageDao.updateById(update);
     }
 
@@ -141,6 +150,10 @@ public class TextMsgHandler extends AbstractMsgHandler<TextMsgDTO> {
         TextMsgResp textMsgResp = TextMsgResp.builder()
                 .content(textMsgDTO.getContent())
                 .build();
+        // 设置艾特的uid
+        textMsgResp.setAtUidList(textMsgDTO.getAtUidList());
+        // 设置url解析内容
+        textMsgResp.setUrlContentMap(Optional.ofNullable(textMsgDTO).map(TextMsgDTO::getUrlContentMap).orElse(null));
         // 回复消息的展示
         // 1. 获取回复的那条消息
         Optional<Message> reply = Optional.ofNullable(textMsgDTO.getReplyMsgId())
@@ -153,8 +166,6 @@ public class TextMsgHandler extends AbstractMsgHandler<TextMsgDTO> {
         Message replyMessage = reply.get();
         User replyUserInfo = userInfoCache.get(replyMessage.getFromUid());
         textMsgResp.setReply(MessageAdapter.buildReplyMessage(textMsgDTO, replyMessage, replyUserInfo));
-        // 设置艾特的uid
-        textMsgResp.setAtUidList(textMsgDTO.getAtUidList());
         return textMsgResp;
     }
 
