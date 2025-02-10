@@ -7,6 +7,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 /**
  * 文本消息回复体
  * @author Ershi
@@ -19,6 +21,9 @@ import lombok.NoArgsConstructor;
 public class TextMsgResp implements BaseMsgDTO {
     @ApiModelProperty("消息内容")
     private String content;
+
+    @ApiModelProperty("艾特的uid")
+    private List<Long> atUidList;
 
     @ApiModelProperty("回复的消息，如果没有回复的消息，返回的是null")
     private ReplyMsg reply;
