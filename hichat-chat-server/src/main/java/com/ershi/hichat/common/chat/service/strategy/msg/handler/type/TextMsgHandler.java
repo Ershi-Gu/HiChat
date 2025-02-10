@@ -17,6 +17,9 @@ import com.ershi.hichat.common.chat.service.strategy.msg.handler.AbstractMsgHand
 import com.ershi.hichat.common.common.exception.BusinessException;
 import com.ershi.hichat.common.common.utils.AssertUtil;
 import com.ershi.hichat.common.user.domain.entity.User;
+import com.ershi.hichat.common.user.domain.entity.UserRole;
+import com.ershi.hichat.common.user.domain.enums.RoleEnum;
+import com.ershi.hichat.common.user.service.UserRoleService;
 import com.ershi.hichat.common.user.service.cache.UserInfoCache;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -43,6 +46,9 @@ public class TextMsgHandler extends AbstractMsgHandler<TextMsgDTO> {
     @Autowired
     private UserInfoCache userInfoCache;
 
+    @Autowired
+    private UserRoleService userRoleService;
+
     @Override
     protected MessageTypeEnum getMessageTypeEnum() {
         return MessageTypeEnum.TEXT;
@@ -59,9 +65,8 @@ public class TextMsgHandler extends AbstractMsgHandler<TextMsgDTO> {
     protected void checkMsg(TextMsgDTO messageBody, Long roomId, Long uid) {
         // 如果是回复消息，校验回复消息是否存在以及合法性
         checkReplyMsg(messageBody, roomId);
-        // todo 艾特用户校验
         // 如果有艾特用户，需要校验艾特合法性
-//        checkAtMsg(messageBody, roomId, uid);
+        checkAtMsg(messageBody, roomId, uid);
     }
 
     /**
@@ -89,16 +94,19 @@ public class TextMsgHandler extends AbstractMsgHandler<TextMsgDTO> {
         if (CollectionUtil.isNotEmpty(messageBody.getAtUidList())) {
             // 前端传入的艾特用户列表可能会重复，需要去重，支持多次艾特一个用户，但是只显示一次
             List<Long> atUidList = messageBody.getAtUidList().stream().distinct().collect(Collectors.toList());
+            Long atUidNum = (long) atUidList.size();
             Map<Long, User> userMap = userInfoCache.getBatch(atUidList);
-            // 校验艾特的用户是否错在
-            // 如果艾特用户不存在，userInfoCache返回的map中依然存在该key，但是value为null，需要过滤掉再校验
-            long batchCount = userMap.values().stream().filter(Objects::nonNull).count();
-            AssertUtil.equal((long) atUidList.size(), batchCount, "@用户不存在");
             // 检查是否是艾特全体成员
             boolean atAll = messageBody.getAtUidList().contains(0L);
             if (atAll) { // 若是则判断用户在该群聊中的权限
-
+                // todo 房间管理员还需要设计
+                AssertUtil.isTrue(userRoleService.checkAuth(uid, RoleEnum.ADMIN), "没有权限");
+                atUidNum--;
             }
+            // 校验艾特的用户是否存在
+            // 如果艾特用户不存在，userInfoCache返回的map中依然存在该key，但是value为null，需要过滤掉再校验；同时过滤掉0L，表示艾特全体成员
+            long batchCount = userMap.values().stream().filter(Objects::nonNull).count();
+            AssertUtil.equal(atUidNum, batchCount, "@用户不存在");
         }
     }
 
@@ -121,13 +129,15 @@ public class TextMsgHandler extends AbstractMsgHandler<TextMsgDTO> {
             Integer gapCountToReply = messageDao.getGapCount(msg.getRoomId(), msg.getId(), textMsgDTO.getReplyMsgId());
             textMsgDTO.setGapCountToReply(gapCountToReply);
         }
+        // 去重艾特的uid
+        textMsgDTO.setAtUidList(textMsgDTO.getAtUidList().stream().distinct().collect(Collectors.toList()));
         messageDao.updateById(update);
     }
 
     @Override
     public BaseMsgDTO showMsg(Message msg) {
-        // 构建文本消息返回体
         TextMsgDTO textMsgDTO = msg.getExtra().getTextMsgDTO();
+        // 构建文本消息返回体
         TextMsgResp textMsgResp = TextMsgResp.builder()
                 .content(textMsgDTO.getContent())
                 .build();
@@ -143,6 +153,8 @@ public class TextMsgHandler extends AbstractMsgHandler<TextMsgDTO> {
         Message replyMessage = reply.get();
         User replyUserInfo = userInfoCache.get(replyMessage.getFromUid());
         textMsgResp.setReply(MessageAdapter.buildReplyMessage(textMsgDTO, replyMessage, replyUserInfo));
+        // 设置艾特的uid
+        textMsgResp.setAtUidList(textMsgDTO.getAtUidList());
         return textMsgResp;
     }
 
