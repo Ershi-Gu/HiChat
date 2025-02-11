@@ -1,0 +1,33 @@
+# minio
+    server {
+      listen       80;
+      server_name  minio.guershi.cn;
+      #将请求转成https
+      rewrite ^(.*)$ https://$host$1 permanent;
+    }
+
+    server {
+      listen       443 ssl;
+      server_name  minio.guershi.cn;
+
+      #频率控制
+      limit_req zone=one burst=10 nodelay;
+
+      # 证书位置
+      ssl_certificate /etc/nginx/certificates/fullchain.pem;
+      ssl_certificate_key /etc/nginx/certificates/privkey.pem;
+
+      ssl_session_cache    shared:SSL:1m;
+      ssl_session_timeout  5m;
+
+      location / {
+          client_body_buffer_size 10M;
+          # 限制上传最大文件大小
+          client_max_body_size 1G;
+          proxy_buffers 1024 4k;
+	        proxy_set_header Host $host;
+	        proxy_set_header Remote_Addr $remote_addr;
+	        proxy_set_header X-Real-IP $remote_addr;
+	        proxy_pass http://minio实际地址api:10010;
+    	}
+    }

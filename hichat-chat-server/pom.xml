@@ -15,6 +15,18 @@
             <groupId>com.ershi</groupId>
             <artifactId>hichat-common-starter</artifactId>
         </dependency>
+        <!--hichat-transaction事务管理包-->
+        <dependency>
+            <groupId>com.ershi</groupId>
+            <artifactId>hichat-transaction</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
+        <!--hichat-oss文件交互包-->
+        <dependency>
+            <groupId>com.ershi</groupId>
+            <artifactId>hichat-oss-starter</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
         <!--微信开发工具sdk https://github.com/binarywang/weixin-java-mp-demo-->
         <dependency>
             <groupId>com.github.binarywang</groupId>
@@ -26,15 +38,10 @@
             <groupId>com.github.ben-manes.caffeine</groupId>
             <artifactId>caffeine</artifactId>
         </dependency>
+        <!--jwt校验包-->
         <dependency>
             <groupId>com.auth0</groupId>
             <artifactId>java-jwt</artifactId>
-        </dependency>
-        <!--hichat-transaction-->
-        <dependency>
-            <groupId>com.ershi</groupId>
-            <artifactId>hichat-transaction</artifactId>
-            <version>1.0-SNAPSHOT</version>
         </dependency>
     </dependencies>
     <build>

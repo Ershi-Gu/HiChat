@@ -1,0 +1,10 @@
+docker run -d \
+  --name nginx \
+  -p 80:80 \
+  -p 443:443 \
+  -v /root/nginx/html:/usr/share/nginx/html \
+  -v /root/nginx/nginx.conf:/etc/nginx/nginx.conf \
+  -v /etc/letsencrypt/live/域名/fullchain.pem:/etc/nginx/certificates/fullchain.pem:ro \
+  -v /etc/letsencrypt/live/域名/privkey.pem:/etc/nginx/certificates/privkey.pem:ro \
+  --env TZ=Asia/Shanghai \
+  nginx
