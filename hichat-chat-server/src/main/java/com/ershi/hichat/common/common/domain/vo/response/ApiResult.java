@@ -1,4 +1,4 @@
-package com.ershi.hichat.common.common.domain.vo;
+package com.ershi.hichat.common.common.domain.vo.response;
 
 import com.ershi.hichat.common.common.exception.ErrorEnum;
 import io.swagger.annotations.ApiModel;

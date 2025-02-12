@@ -1,7 +1,7 @@
 package com.ershi.hichat.common.user.controller;
 
 
-import com.ershi.hichat.common.common.domain.vo.ApiResult;
+import com.ershi.hichat.common.common.domain.vo.response.ApiResult;
 import com.ershi.hichat.common.common.utils.RequestHolder;
 import com.ershi.hichat.common.domain.vo.request.CursorPageBaseReq;
 import com.ershi.hichat.common.domain.vo.request.PageBaseReq;
@@ -18,7 +18,6 @@ import com.ershi.hichat.common.user.domain.vo.response.friend.FriendUnreadResp;
 import com.ershi.hichat.common.user.service.UserFriendService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 

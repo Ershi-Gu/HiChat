@@ -2,7 +2,7 @@ package com.ershi.hichat.common.user.controller;
 
 
 import com.ershi.hichat.common.common.annotation.AuthCheck;
-import com.ershi.hichat.common.common.domain.vo.ApiResult;
+import com.ershi.hichat.common.common.domain.vo.response.ApiResult;
 import com.ershi.hichat.common.common.utils.RequestHolder;
 import com.ershi.hichat.common.user.domain.enums.RoleEnum;
 import com.ershi.hichat.common.user.domain.vo.request.user.*;

@@ -1,6 +1,6 @@
 package com.ershi.hichat.common.common.exception;
 
-import com.ershi.hichat.common.common.domain.vo.ApiResult;
+import com.ershi.hichat.common.common.domain.vo.response.ApiResult;
 import com.ershi.hichat.common.common.utils.adapter.ErrorMsgAdapter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.BindException;

@@ -2,7 +2,7 @@ package com.ershi.hichat.common.common.exception;
 
 import cn.hutool.http.ContentType;
 import cn.hutool.json.JSONUtil;
-import com.ershi.hichat.common.common.domain.vo.ApiResult;
+import com.ershi.hichat.common.common.domain.vo.response.ApiResult;
 import com.google.common.base.Charsets;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
