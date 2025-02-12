@@ -15,6 +15,7 @@ import com.ershi.hichat.common.chat.service.strategy.msg.handler.AbstractMsgHand
 import com.ershi.hichat.common.common.utils.AssertUtil;
 import com.ershi.hichat.common.common.utils.discover.PrioritizedUrlDiscover;
 import com.ershi.hichat.common.common.utils.discover.domain.UrlAnalysisInfo;
+import com.ershi.hichat.common.sensitive.algorithm.sensitiveWord.SensitiveWordBusiness;
 import com.ershi.hichat.common.user.domain.entity.User;
 import com.ershi.hichat.common.user.domain.enums.RoleEnum;
 import com.ershi.hichat.common.user.service.UserRoleService;
@@ -46,6 +47,9 @@ public class TextMsgHandler extends AbstractMsgHandler<TextMsgDTO> {
 
     @Autowired
     private UserRoleService userRoleService;
+
+    @Autowired
+    private SensitiveWordBusiness sensitiveWordBusiness;
 
     /**
      * URL解析器
@@ -127,6 +131,8 @@ public class TextMsgHandler extends AbstractMsgHandler<TextMsgDTO> {
         update.setId(msg.getId());
         update.setExtra(extra);
         extra.setTextMsgDTO(textMsgDTO);
+        // 敏感词过滤
+        textMsgDTO.setContent(sensitiveWordBusiness.filter(textMsgDTO.getContent()));
         // 判断是否是回复消息，若是则计算出与回复消息相差条数并存储
         if (Objects.nonNull(textMsgDTO.getReplyMsgId())) {
             Integer gapCountToReply = messageDao.getGapCount(msg.getRoomId(), msg.getId(), textMsgDTO.getReplyMsgId());
