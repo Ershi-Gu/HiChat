@@ -1,4 +1,4 @@
-package com.ershi.hichat.common.chat.domain.vo.response;
+package com.ershi.hichat.common.chat.domain.vo.response.msg;
 
 import com.ershi.hichat.common.chat.domain.entity.msg.BaseMsgDTO;
 import io.swagger.annotations.ApiModelProperty;

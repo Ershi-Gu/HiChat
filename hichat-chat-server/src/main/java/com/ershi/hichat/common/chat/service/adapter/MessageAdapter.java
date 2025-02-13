@@ -6,14 +6,12 @@ import com.ershi.hichat.common.chat.domain.entity.msg.type.TextMsgDTO;
 import com.ershi.hichat.common.chat.domain.enums.MessageStatusEnum;
 import com.ershi.hichat.common.chat.domain.enums.MessageTypeEnum;
 import com.ershi.hichat.common.chat.domain.vo.request.msg.ChatMessageReq;
-import com.ershi.hichat.common.chat.domain.vo.response.ChatMessageResp;
+import com.ershi.hichat.common.chat.domain.vo.response.msg.ChatMessageResp;
 import com.ershi.hichat.common.chat.domain.vo.response.msg.TextMsgResp;
 import com.ershi.hichat.common.chat.service.strategy.msg.MsgHandlerFactory;
 import com.ershi.hichat.common.chat.service.strategy.msg.handler.AbstractMsgHandler;
 import com.ershi.hichat.common.common.domain.enums.YesOrNoEnum;
 import com.ershi.hichat.common.user.domain.entity.User;
-import com.ershi.hichat.common.user.service.cache.UserInfoCache;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Comparator;
 import java.util.List;

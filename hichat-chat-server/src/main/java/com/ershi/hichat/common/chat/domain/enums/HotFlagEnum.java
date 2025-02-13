@@ -16,6 +16,8 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 @Getter
 public enum HotFlagEnum {
+
+    ALL(-1, "全员群"),
     NOT(0, "非热点"),
     YES(1, "热点"),
     ;

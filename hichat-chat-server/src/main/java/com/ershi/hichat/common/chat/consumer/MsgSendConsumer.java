@@ -8,7 +8,7 @@ import com.ershi.hichat.common.chat.domain.entity.Message;
 import com.ershi.hichat.common.chat.domain.entity.Room;
 import com.ershi.hichat.common.chat.domain.entity.RoomFriend;
 import com.ershi.hichat.common.chat.domain.enums.RoomTypeEnum;
-import com.ershi.hichat.common.chat.domain.vo.response.ChatMessageResp;
+import com.ershi.hichat.common.chat.domain.vo.response.msg.ChatMessageResp;
 import com.ershi.hichat.common.chat.service.ChatService;
 import com.ershi.hichat.common.chat.service.cache.GroupMemberCache;
 import com.ershi.hichat.common.chat.service.cache.HotRoomCache;
@@ -68,7 +68,7 @@ public class MsgSendConsumer implements RocketMQListener<MsgSendMessageDTO> {
         // 更新本条消息所属房间最新记录消息点
         roomDao.refreshActiveTime(room.getId(), message.getId(), message.getCreateTime());
         roomCache.delete(room.getId());
-        if (room.isHotRoom()) { // 热门群聊额外使用Redis存储更新时间，这样在热点消息聚合时，直接去Redis即可拿到最新消息
+        if (room.isHotRoom()) { // 热门群聊额外使用Redis存储更新时间，这样在热点消息聚合时，直接去Redis拿到时间即可做热点群聊会话排序
             // 更新热门群聊时间-redis
             hotRoomCache.refreshActiveTime(room.getId(), message.getCreateTime());
             // 判断是否是全员群
@@ -81,9 +81,9 @@ public class MsgSendConsumer implements RocketMQListener<MsgSendMessageDTO> {
             }
         } else {
             List<Long> memberUidList = new ArrayList<>();
-            if (Objects.equals(room.getType(), RoomTypeEnum.GROUP.getType())) {//普通群聊推送所有群成员
+            if (Objects.equals(room.getType(), RoomTypeEnum.GROUP.getType())) { //普通群聊推送所有群成员
                 memberUidList = getMemberUidList(room);
-            } else if (Objects.equals(room.getType(), RoomTypeEnum.FRIEND.getType())) {//单聊对象
+            } else if (Objects.equals(room.getType(), RoomTypeEnum.FRIEND.getType())) { // 单聊对象
                 // 对单人推送
                 RoomFriend roomFriend = roomFriendDao.getByRoomId(room.getId());
                 memberUidList = Arrays.asList(roomFriend.getUid1(), roomFriend.getUid2());

@@ -41,7 +41,7 @@ public class Room implements Serializable {
     private Integer type;
 
     /**
-     * 是否全员展示 0否 1是
+     * 是否是热点群 -1全员群 0否 1是
      */
     @TableField("hot_flag")
     private Integer hotFlag;
@@ -101,7 +101,7 @@ public class Room implements Serializable {
      */
     @JsonIgnore
     public boolean isHotRoom() {
-        return HotFlagEnum.of(this.hotFlag) == HotFlagEnum.YES;
+        return isAllRoom() || HotFlagEnum.of(this.hotFlag) == HotFlagEnum.YES;
     }
 
     /**
@@ -110,6 +110,6 @@ public class Room implements Serializable {
      */
     @JsonIgnore
     public boolean isAllRoom() {
-        return RoomTypeEnum.of(this.type) == RoomTypeEnum.ALL;
+        return HotFlagEnum.of(this.hotFlag) == HotFlagEnum.ALL;
     }
 }

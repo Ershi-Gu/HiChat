@@ -2,7 +2,7 @@ package com.ershi.hichat.common.websocket.service.adapter;
 
 import com.ershi.hichat.common.chat.domain.dto.ChatMessageMarkDTO;
 import com.ershi.hichat.common.chat.domain.dto.ChatMsgRecallDTO;
-import com.ershi.hichat.common.chat.domain.vo.response.ChatMessageResp;
+import com.ershi.hichat.common.chat.domain.vo.response.msg.ChatMessageResp;
 import com.ershi.hichat.common.user.domain.entity.User;
 import com.ershi.hichat.common.websocket.domain.enums.WSRespTypeEnum;
 import com.ershi.hichat.common.websocket.domain.vo.response.WSBaseResp;

@@ -17,7 +17,7 @@ import com.ershi.hichat.common.chat.domain.vo.request.msg.ChatMessageMarkReq;
 import com.ershi.hichat.common.chat.domain.vo.request.msg.ChatMessagePageReq;
 import com.ershi.hichat.common.chat.domain.vo.request.msg.ChatMessageRecallReq;
 import com.ershi.hichat.common.chat.domain.vo.request.msg.ChatMessageReq;
-import com.ershi.hichat.common.chat.domain.vo.response.ChatMessageResp;
+import com.ershi.hichat.common.chat.domain.vo.response.msg.ChatMessageResp;
 import com.ershi.hichat.common.chat.service.ChatService;
 import com.ershi.hichat.common.chat.service.adapter.MessageAdapter;
 import com.ershi.hichat.common.chat.service.cache.RoomCache;
