@@ -7,6 +7,7 @@ import com.ershi.hichat.common.common.event.UserRegisterEvent;
 import com.ershi.hichat.common.common.exception.BusinessException;
 import com.ershi.hichat.common.common.utils.AssertUtil;
 import com.ershi.hichat.common.common.utils.RequestHolder;
+import com.ershi.hichat.common.sensitive.algorithm.sensitiveWord.SensitiveWordBusiness;
 import com.ershi.hichat.common.user.dao.BlackDao;
 import com.ershi.hichat.common.user.dao.UserBackpackDao;
 import com.ershi.hichat.common.user.dao.UserDao;
@@ -63,6 +64,9 @@ public class UserServiceImpl implements UserService {
     @Autowired
     private AggregateUserInfoCache aggregateUserInfoCache;
 
+    @Autowired
+    private SensitiveWordBusiness sensitiveWordBusiness;
+
     /**
      * 注册
      *
@@ -102,6 +106,7 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public void modifyName(Long uid, String name) {
+        AssertUtil.isFalse(sensitiveWordBusiness.hasSensitiveWord(name), "名字中包含敏感词，请重新输入");
         // 判断名字是否重复
         User oldUser = userDao.getByName(name);
         AssertUtil.isEmpty(oldUser, "名字已存在，换个名字吧~");
