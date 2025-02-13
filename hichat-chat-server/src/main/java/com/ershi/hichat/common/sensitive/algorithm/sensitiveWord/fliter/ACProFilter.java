@@ -16,6 +16,10 @@ public class ACProFilter implements SensitiveWordFilter {
 
     private ACProTrie acProTrie;
 
+    public static ACProFilter getInstance() {
+        return new ACProFilter();
+    }
+
     @Override
     public boolean hasSensitiveWord(String text) {
         if(StringUtils.isBlank(text)) return false;

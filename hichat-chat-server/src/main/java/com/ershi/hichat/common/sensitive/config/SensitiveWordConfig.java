@@ -1,6 +1,7 @@
-package com.ershi.hichat.common.common.config;
+package com.ershi.hichat.common.sensitive.config;
 
 import com.ershi.hichat.common.sensitive.HiChatWordFactory;
+import com.ershi.hichat.common.sensitive.algorithm.sensitiveWord.fliter.ACProFilter;
 import com.ershi.hichat.common.sensitive.algorithm.sensitiveWord.fliter.DFAFilter;
 import com.ershi.hichat.common.sensitive.algorithm.sensitiveWord.SensitiveWordBusiness;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,7 +28,7 @@ public class SensitiveWordConfig {
     @Bean
     public SensitiveWordBusiness sensitiveWordBusiness() {
         return SensitiveWordBusiness.newInstance()
-                .filterStrategy(DFAFilter.getInstance())
+                .filterStrategy(ACProFilter.getInstance())
                 .sensitiveWord(hiChatWordFactory)
                 .init();
     }

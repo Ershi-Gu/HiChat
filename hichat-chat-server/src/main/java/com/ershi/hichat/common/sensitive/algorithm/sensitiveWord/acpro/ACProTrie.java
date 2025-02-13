@@ -2,26 +2,23 @@ package com.ershi.hichat.common.sensitive.algorithm.sensitiveWord.acpro;
 
 import java.util.*;
 
+
 /**
- * @author CtrlCver
- * @date 2024/1/12
- * @description: AC自动机
+ * AC自动机实现敏感词过滤-支持特殊符号过滤
+ * @author Ershi
+ * @date 2025/02/13
  */
 public class ACProTrie {
 
     private final static char MASK = '*'; // 替代字符
+    private static final String SPECIAL_SYMBOLS = " !*-+_=,，.@;:；：。、？?（）()【】[]《》<>“”\"‘’";
 
     private Word root;
 
-    // 节点
     static class Word {
-        // 判断是否是敏感词结尾
-        boolean end = false;
-        // 失败回调节点/状态
-        Word failOver = null;
-        // 记录字符偏移
-        int depth = 0;
-        // 下个自动机状态
+        boolean end = false;          // 是否为敏感词结尾
+        Word failOver = null;         // 失败指针
+        int depth = 0;                // 节点深度（根节点到该节点的长度）
         Map<Character, Word> next = new HashMap<>();
 
         public boolean hasChild(char c) {
@@ -29,101 +26,123 @@ public class ACProTrie {
         }
     }
 
-    //构建ACTrie
+    // 构建AC自动机
     public void createACTrie(List<String> list) {
-        Word currentNode = new Word();
-        root = currentNode;
-        for (String key : list) {
-            currentNode = root;
-            for (int j = 0; j < key.length(); j++) {
-                if (currentNode.next != null && currentNode.next.containsKey(key.charAt(j))) {
-                    currentNode = currentNode.next.get(key.charAt(j));
-                    // 防止乱序输入改变end,比如da，dadac，dadac先进入，第二个a为false,da进入后把a设置为true
-                    // 这样结果就是a是end，c也是end
-                    if (j == key.length() - 1) {
-                        currentNode.end = true;
-                    }
-                } else {
-                    Word map = new Word();
-                    if (j == key.length() - 1) {
-                        map.end = true;
-                    }
-                    currentNode.next.put(key.charAt(j), map);
-                    currentNode = map;
+        root = new Word();
+        for (String keyword : list) {
+            Word current = root;
+            for (int i = 0; i < keyword.length(); i++) {
+                char c = keyword.charAt(i);
+                if (!current.next.containsKey(c)) {
+                    current.next.put(c, new Word());
                 }
-                currentNode.depth = j + 1;
+                current = current.next.get(c);
+                current.depth = i + 1;  // 更新节点深度
             }
+            current.end = true; // 标记敏感词结尾
         }
-        initFailOver();
+        initFailOver(); // 初始化失败指针
     }
 
-    // 初始化匹配失败回调节点/状态
-    public void initFailOver() {
+    // 初始化失败指针（BFS构建）
+    private void initFailOver() {
         Queue<Word> queue = new LinkedList<>();
-        Map<Character, Word> children = root.next;
-        for (Word node : children.values()) {
-            node.failOver = root;
-            queue.offer(node);
-        }
+        root.failOver = null;
+        queue.addAll(root.next.values());
+
         while (!queue.isEmpty()) {
-            Word parentNode = queue.poll();
-            for (Map.Entry<Character, Word> entry : parentNode.next.entrySet()) {
-                Word childNode = entry.getValue();
-                Word failOver = parentNode.failOver;
-                while (failOver != null && (!failOver.next.containsKey(entry.getKey()))) {
+            Word current = queue.poll();
+
+            for (Map.Entry<Character, Word> entry : current.next.entrySet()) {
+                char c = entry.getKey();
+                Word child = entry.getValue();
+                Word failOver = current.failOver;
+
+                // 回溯失败指针直到找到匹配或根节点
+                while (failOver != null && !failOver.hasChild(c)) {
                     failOver = failOver.failOver;
                 }
-                if (failOver == null) {
-                    childNode.failOver = root;
-                } else {
-                    childNode.failOver = failOver.next.get(entry.getKey());
-                }
-                queue.offer(childNode);
+                child.failOver = (failOver == null) ? root : failOver.next.get(c);
+                queue.add(child);
             }
         }
     }
 
-    // 匹配
-    public String match(String matchWord) {
-        Word walkNode = root;
-        char[] wordArray = matchWord.toCharArray();
-        for (int i = 0; i < wordArray.length; i++) {
-            // 失败"回溯"
-            while (!walkNode.hasChild(wordArray[i]) && walkNode.failOver != null) {
-                walkNode = walkNode.failOver;
-            }
-            if (walkNode.hasChild(wordArray[i])) {
-                walkNode = walkNode.next.get(wordArray[i]);
-                if (walkNode.end) {
-                    // sentinelA和sentinelB作为哨兵节点，去后面探测是否仍存在end
-                    Word sentinelA = walkNode; // 记录当前节点
-                    Word sentinelB = walkNode; //记录end节点
-                    int k = i + 1;
-                    boolean flag = false;
-                    //判断end是不是最终end即敏感词是否存在包含关系(abc,abcd)
-                    while (k < wordArray.length && sentinelA.hasChild(wordArray[k])) {
-                        sentinelA = sentinelA.next.get(wordArray[k]);
-                        k++;
-                        if (sentinelA.end) {
-                            sentinelB = sentinelA;
-                            flag = true;
-                        }
-                    }
-                    // 根据结果去替换*
-                    // 计算替换长度
-                    int len = flag ? sentinelB.depth : walkNode.depth;
-                    while (len > 0) {
-                        len--;
-                        int index = flag ? i - walkNode.depth + 1 + len : i - len;
-                        wordArray[index] = MASK;
-                    }
-                    // 更新i
-                    i += flag ? sentinelB.depth : 0;
-                    // 更新node
-                    walkNode = flag ? sentinelB.failOver : walkNode.failOver;
-                }
+    // 匹配并替换敏感词（支持特殊符号忽略）
+    public String match(String text) {
+        // 预处理：过滤特殊符号并记录原始位置
+        List<Character> filteredChars = new ArrayList<>();
+        List<Integer> originalIndices = new ArrayList<>();
+        for (int i = 0; i < text.length(); i++) {
+            char c = text.charAt(i);
+            if (!isSpecialSymbol(c)) {
+                filteredChars.add(c);
+                originalIndices.add(i);
             }
         }
-        return new String(wordArray);
+
+        boolean[] mask = new boolean[text.length()]; // 标记需替换的位置
+        Word currentState = root;
+
+        for (int i = 0; i < filteredChars.size(); ) {
+            char c = filteredChars.get(i);
+            // 失败指针回溯
+            while (currentState != null && !currentState.hasChild(c)) {
+                currentState = currentState.failOver;
+            }
+            if (currentState == null) {
+                currentState = root;
+                i++;
+                continue;
+            }
+
+            currentState = currentState.next.get(c);
+            if (currentState.end) {
+                // 查找最长匹配
+                int maxLength = currentState.depth;
+                int endIndex = i;
+                Word longestMatch = currentState;
+
+                // 继续向后查找更长的匹配
+                for (int j = i + 1; j < filteredChars.size(); j++) {
+                    char nextChar = filteredChars.get(j);
+                    while (longestMatch != null && !longestMatch.hasChild(nextChar)) {
+                        longestMatch = longestMatch.failOver;
+                    }
+                    if (longestMatch == null) break;
+
+                    longestMatch = longestMatch.next.get(nextChar);
+                    if (longestMatch.end) {
+                        maxLength = longestMatch.depth;
+                        endIndex = j;
+                    }
+                }
+
+                // 计算原始位置范围
+                int startPos = originalIndices.get(endIndex - maxLength + 1);
+                int endPos = originalIndices.get(endIndex);
+
+                // 标记替换区域
+                Arrays.fill(mask, startPos, endPos + 1, true);
+
+                // 跳过已处理部分
+                i = endIndex + 1;
+                currentState = longestMatch.failOver != null ? longestMatch.failOver : root;
+            } else {
+                i++;
+            }
+        }
+
+        // 执行替换
+        char[] chars = text.toCharArray();
+        for (int i = 0; i < chars.length; i++) {
+            if (mask[i]) chars[i] = MASK;
+        }
+        return new String(chars);
+    }
+
+    // 判断是否为特殊符号
+    private boolean isSpecialSymbol(char c) {
+        return SPECIAL_SYMBOLS.indexOf(c) != -1;
     }
 }
