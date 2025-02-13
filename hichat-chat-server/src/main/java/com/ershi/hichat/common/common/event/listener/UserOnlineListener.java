@@ -6,7 +6,7 @@ import com.ershi.hichat.common.user.domain.entity.User;
 import com.ershi.hichat.common.user.service.IpForUserService;
 import com.ershi.hichat.common.user.service.cache.UserInfoCache;
 import com.ershi.hichat.common.websocket.service.PushService;
-import com.ershi.hichat.common.websocket.service.adapter.WSAdapter;
+import com.ershi.hichat.common.websocket.service.adapter.WSMsgAdapter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Async;
@@ -43,7 +43,7 @@ public class UserOnlineListener {
         User user = event.getUser();
         userInfoCache.online(user.getId(), user.getLastOptTime());
         // todo 推送给所有在线用户，该用户登录成功
-        pushService.sendPushMsg(WSAdapter.buildOnlineNotifyResp(event.getUser()));
+        pushService.sendPushMsg(WSMsgAdapter.buildOnlineNotifyResp(event.getUser()));
     }
 
     /**

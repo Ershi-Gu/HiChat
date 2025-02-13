@@ -1,14 +1,18 @@
 package com.ershi.hichat.common.websocket.service.adapter;
 
+import com.ershi.hichat.common.chat.domain.dto.ChatMessageMarkDTO;
 import com.ershi.hichat.common.chat.domain.dto.ChatMsgRecallDTO;
 import com.ershi.hichat.common.chat.domain.vo.response.ChatMessageResp;
 import com.ershi.hichat.common.user.domain.entity.User;
 import com.ershi.hichat.common.websocket.domain.enums.WSRespTypeEnum;
 import com.ershi.hichat.common.websocket.domain.vo.response.WSBaseResp;
 import com.ershi.hichat.common.websocket.domain.vo.response.dataclass.WSFriendApply;
+import com.ershi.hichat.common.websocket.domain.vo.response.dataclass.WSMsgMark;
 import com.ershi.hichat.common.websocket.domain.vo.response.dataclass.WSRecallMsg;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Component;
+
+import java.util.Collections;
 
 /**
  * ws消息适配器
@@ -17,10 +21,10 @@ import org.springframework.stereotype.Component;
  * @date 2025/02/05
  */
 @Component
-public class WSAdapter {
+public class WSMsgAdapter {
 
     /**
-     * 构建ws消息推送体
+     * 构建ws普通消息推送体
      * @param msgResp
      * @return {@link WSBaseResp }<{@link ChatMessageResp }>
      */
@@ -73,6 +77,25 @@ public class WSAdapter {
         WSRecallMsg recall = new WSRecallMsg();
         BeanUtils.copyProperties(chatMsgRecallDTO, recall);
         wsBaseResp.setData(recall);
+        return wsBaseResp;
+    }
+
+    /**
+     * 构建消息标记推送体
+     *
+     * @param chatMessageMarkDTO
+     * @param markCount
+     * @return {@link WSBaseResp }<{@link ? }>
+     */
+    public static WSBaseResp<?> buildMsgMarkSend(ChatMessageMarkDTO chatMessageMarkDTO, Integer markCount) {
+        WSMsgMark.WSMsgMarkItem item = new WSMsgMark.WSMsgMarkItem();
+        BeanUtils.copyProperties(chatMessageMarkDTO, item);
+        item.setMarkCount(markCount);
+        WSBaseResp<WSMsgMark> wsBaseResp = new WSBaseResp<>();
+        wsBaseResp.setType(WSRespTypeEnum.MARK.getType());
+        WSMsgMark mark = new WSMsgMark();
+        mark.setMarkList(Collections.singletonList(item));
+        wsBaseResp.setData(mark);
         return wsBaseResp;
     }
 }

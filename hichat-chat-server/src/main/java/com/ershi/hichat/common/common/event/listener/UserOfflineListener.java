@@ -6,7 +6,7 @@ import com.ershi.hichat.common.user.domain.entity.User;
 import com.ershi.hichat.common.user.service.IpForUserService;
 import com.ershi.hichat.common.user.service.cache.UserInfoCache;
 import com.ershi.hichat.common.websocket.service.WebSocketService;
-import com.ershi.hichat.common.websocket.service.adapter.WSAdapter;
+import com.ershi.hichat.common.websocket.service.adapter.WSMsgAdapter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.event.EventListener;
@@ -42,7 +42,7 @@ public class UserOfflineListener {
         // 更新用户在线表-redis
         userInfoCache.offline(user.getId(), user.getLastOptTime());
         // todo 推送给所有在线用户，该用户下线
-        webSocketService.sendMsgToAllOnline(WSAdapter.buildOfflineNotifyResp(event.getUser()), Collections.singletonList(event.getUser().getId()));
+        webSocketService.sendMsgToAllOnline(WSMsgAdapter.buildOfflineNotifyResp(event.getUser()), Collections.singletonList(event.getUser().getId()));
     }
 
     /**

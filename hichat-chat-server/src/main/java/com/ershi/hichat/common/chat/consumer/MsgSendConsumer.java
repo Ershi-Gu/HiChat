@@ -16,11 +16,10 @@ import com.ershi.hichat.common.chat.service.cache.RoomCache;
 import com.ershi.hichat.common.common.constant.MQConstant;
 import com.ershi.hichat.common.common.domain.dto.MsgSendMessageDTO;
 import com.ershi.hichat.common.websocket.service.PushService;
-import com.ershi.hichat.common.websocket.service.adapter.WSAdapter;
+import com.ershi.hichat.common.websocket.service.adapter.WSMsgAdapter;
 import org.apache.rocketmq.spring.annotation.RocketMQMessageListener;
 import org.apache.rocketmq.spring.core.RocketMQListener;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -74,11 +73,11 @@ public class MsgSendConsumer implements RocketMQListener<MsgSendMessageDTO> {
             hotRoomCache.refreshActiveTime(room.getId(), message.getCreateTime());
             // 判断是否是全员群
             if (room.isAllRoom()) {
-                pushService.sendPushMsg(WSAdapter.buildMsgSend(msgResp));
+                pushService.sendPushMsg(WSMsgAdapter.buildMsgSend(msgResp));
             } else {
                 // 推送给人们群聊中的指定用户
                 List<Long> memberUidList = getMemberUidList(room);
-                pushService.sendPushMsg(WSAdapter.buildMsgSend(msgResp), memberUidList);
+                pushService.sendPushMsg(WSMsgAdapter.buildMsgSend(msgResp), memberUidList);
             }
         } else {
             List<Long> memberUidList = new ArrayList<>();
@@ -92,7 +91,7 @@ public class MsgSendConsumer implements RocketMQListener<MsgSendMessageDTO> {
             // todo 更新所有群成员收件箱的最新会话时间
 //            contactDao.refreshOrCreateActiveTime(room.getId(), memberUidList, message.getId(), message.getCreateTime());
             // 推送房间成员
-            pushService.sendPushMsg(WSAdapter.buildMsgSend(msgResp), memberUidList);
+            pushService.sendPushMsg(WSMsgAdapter.buildMsgSend(msgResp), memberUidList);
         }
     }
 

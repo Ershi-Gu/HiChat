@@ -6,7 +6,7 @@ import com.ershi.hichat.common.chat.domain.entity.Room;
 import com.ershi.hichat.common.chat.service.cache.GroupMemberCache;
 import com.ershi.hichat.common.common.event.MessageRecallEvent;
 import com.ershi.hichat.common.websocket.service.PushService;
-import com.ershi.hichat.common.websocket.service.adapter.WSAdapter;
+import com.ershi.hichat.common.websocket.service.adapter.WSMsgAdapter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
@@ -45,6 +45,6 @@ public class MessageRecallListener {
         Room room = roomDao.getById(chatMsgRecallDTO.getRoomId());
         List<Long> memberUidList = groupMemberCache.getMemberUidList(room.getId());
         // 推送撤回消息到该房间成员
-        pushService.sendPushMsg(WSAdapter.buildMsgRecall(chatMsgRecallDTO), memberUidList);
+        pushService.sendPushMsg(WSMsgAdapter.buildMsgRecall(chatMsgRecallDTO), memberUidList);
     }
 }

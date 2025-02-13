@@ -5,7 +5,7 @@ import com.ershi.hichat.common.user.dao.UserApplyDao;
 import com.ershi.hichat.common.user.domain.entity.UserApply;
 import com.ershi.hichat.common.websocket.domain.vo.response.dataclass.WSFriendApply;
 import com.ershi.hichat.common.websocket.service.PushService;
-import com.ershi.hichat.common.websocket.service.adapter.WSAdapter;
+import com.ershi.hichat.common.websocket.service.adapter.WSMsgAdapter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
@@ -37,7 +37,7 @@ public class UserApplyListener {
         UserApply userApply = event.getUserApply();
         // 获取目标用户所有未读申请的数量通知前端
         Integer unReadCount = userApplyDao.getUnReadCount(userApply.getTargetId());
-        pushService.sendPushMsg(WSAdapter.buildUserApplySend(new WSFriendApply(userApply.getUid(), unReadCount)), userApply.getTargetId());
+        pushService.sendPushMsg(WSMsgAdapter.buildUserApplySend(new WSFriendApply(userApply.getUid(), unReadCount)), userApply.getTargetId());
     }
 
 }
