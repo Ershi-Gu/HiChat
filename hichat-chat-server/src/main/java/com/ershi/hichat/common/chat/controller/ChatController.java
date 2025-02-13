@@ -1,6 +1,7 @@
 package com.ershi.hichat.common.chat.controller;
 
 
+import com.ershi.hichat.common.chat.domain.vo.request.msg.ChatMessageMarkReq;
 import com.ershi.hichat.common.chat.domain.vo.request.msg.ChatMessagePageReq;
 import com.ershi.hichat.common.chat.domain.vo.request.msg.ChatMessageRecallReq;
 import com.ershi.hichat.common.chat.domain.vo.request.msg.ChatMessageReq;
@@ -53,6 +54,13 @@ public class ChatController {
     @ApiOperation("撤回消息")
     public ApiResult<Void> recallMsg(@Valid @RequestBody ChatMessageRecallReq chatMessageRecallReq) {
         chatService.recallMsg(RequestHolder.get().getUid(), chatMessageRecallReq);
+        return ApiResult.success();
+    }
+
+    @PutMapping("/msg/mark")
+    @ApiOperation("消息标记")
+    public ApiResult<Void> setMsgMark(@Valid @RequestBody ChatMessageMarkReq chatMessageMarkReq) {
+        chatService.setMsgMark(RequestHolder.get().getUid(), chatMessageMarkReq);
         return ApiResult.success();
     }
 }

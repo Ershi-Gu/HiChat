@@ -1,6 +1,7 @@
 package com.ershi.hichat.common.chat.service;
 
 import com.ershi.hichat.common.chat.domain.entity.Message;
+import com.ershi.hichat.common.chat.domain.vo.request.msg.ChatMessageMarkReq;
 import com.ershi.hichat.common.chat.domain.vo.request.msg.ChatMessagePageReq;
 import com.ershi.hichat.common.chat.domain.vo.request.msg.ChatMessageRecallReq;
 import com.ershi.hichat.common.chat.domain.vo.request.msg.ChatMessageReq;
@@ -24,4 +25,6 @@ public interface ChatService {
     void filterBlackMsg(CursorPageBaseResp<ChatMessageResp> memberPage);
 
     void recallMsg(Long uid, ChatMessageRecallReq chatMessageRecallReq);
+
+    void setMsgMark(Long uid, ChatMessageMarkReq chatMessageMarkReq);
 }

@@ -10,8 +10,10 @@ import com.ershi.hichat.common.chat.dao.MessageDao;
 import com.ershi.hichat.common.chat.dao.RoomFriendDao;
 import com.ershi.hichat.common.chat.domain.dto.ChatMsgRecallDTO;
 import com.ershi.hichat.common.chat.domain.entity.*;
+import com.ershi.hichat.common.chat.domain.enums.MessageMarkActTypeEnum;
 import com.ershi.hichat.common.chat.domain.enums.MessageTypeEnum;
 import com.ershi.hichat.common.chat.domain.enums.RoomStatusEnum;
+import com.ershi.hichat.common.chat.domain.vo.request.msg.ChatMessageMarkReq;
 import com.ershi.hichat.common.chat.domain.vo.request.msg.ChatMessagePageReq;
 import com.ershi.hichat.common.chat.domain.vo.request.msg.ChatMessageRecallReq;
 import com.ershi.hichat.common.chat.domain.vo.request.msg.ChatMessageReq;
@@ -20,9 +22,12 @@ import com.ershi.hichat.common.chat.service.ChatService;
 import com.ershi.hichat.common.chat.service.adapter.MessageAdapter;
 import com.ershi.hichat.common.chat.service.cache.RoomCache;
 import com.ershi.hichat.common.chat.service.cache.RoomGroupCache;
+import com.ershi.hichat.common.chat.service.strategy.mark.AbstractMsgMarkStrategy;
+import com.ershi.hichat.common.chat.service.strategy.mark.MsgMarkFactory;
 import com.ershi.hichat.common.chat.service.strategy.msg.MsgHandlerFactory;
 import com.ershi.hichat.common.chat.service.strategy.msg.handler.AbstractMsgHandler;
 import com.ershi.hichat.common.chat.service.strategy.msg.handler.type.RecallMsgHandler;
+import com.ershi.hichat.common.common.annotation.RedissonLock;
 import com.ershi.hichat.common.common.event.MessageRecallEvent;
 import com.ershi.hichat.common.common.event.MessageSendEvent;
 import com.ershi.hichat.common.common.utils.AssertUtil;
@@ -245,5 +250,28 @@ public class ChatServiceImpl implements  ChatService {
         // 判断消息是否超过两分钟
         long between = DateUtil.between(message.getCreateTime(), new Date(), DateUnit.MINUTE);
         AssertUtil.isTrue(between < 2, "超过2分钟的消息不能撤回哦");
+    }
+
+    /**
+     * 对消息进行标记
+     * @param uid
+     * @param request
+     */
+    @Override
+    @RedissonLock(key = "#uid")
+    public void setMsgMark(Long uid, ChatMessageMarkReq chatMessageMarkReq) {
+        // 获取消息标记处理器
+        AbstractMsgMarkStrategy msgMarkStrategy = MsgMarkFactory.getStrategyNoNull(chatMessageMarkReq.getMarkType());
+        AssertUtil.isNotEmpty(msgMarkStrategy, "消息标记类型错误");
+        MessageMarkActTypeEnum messageMarkActType = MessageMarkActTypeEnum.of(chatMessageMarkReq.getActType());
+        AssertUtil.isNotEmpty(messageMarkActType, "消息标记动作类型错误");
+        switch (messageMarkActType) {
+            case MARK:
+                msgMarkStrategy.mark(uid, chatMessageMarkReq.getMsgId());
+                break;
+            case UN_MARK:
+                msgMarkStrategy.unMark(uid, chatMessageMarkReq.getMsgId());
+                break;
+        }
     }
 }
