@@ -1,5 +1,6 @@
 package com.ershi.hichat.common.user.service.imp;
 
+import com.ershi.hichat.common.common.annotation.RedissonLock;
 import com.ershi.hichat.common.common.domain.vo.response.IdRespVO;
 import com.ershi.hichat.common.common.utils.AssertUtil;
 import com.ershi.hichat.common.user.dao.UserEmojiDao;
@@ -43,6 +44,7 @@ public class UserEmojiServiceImpl implements UserEmojiService {
      * @return {@link IdRespVO }
      */
     @Override
+    @RedissonLock(key = "#uid")
     public IdRespVO insert(UserEmojiReq userEmojiReq, Long uid) {
         //校验表情数量是否超过30
         int count = userEmojiDao.countByUid(uid);
