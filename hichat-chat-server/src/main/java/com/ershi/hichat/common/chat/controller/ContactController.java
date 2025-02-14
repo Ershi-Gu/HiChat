@@ -2,8 +2,10 @@ package com.ershi.hichat.common.chat.controller;
 
 
 import com.ershi.hichat.common.chat.domain.vo.request.contact.ChatContactPageReq;
+import com.ershi.hichat.common.chat.domain.vo.request.contact.ContactFriendReq;
 import com.ershi.hichat.common.chat.domain.vo.response.contact.ChatContactResp;
 import com.ershi.hichat.common.chat.service.RoomContactService;
+import com.ershi.hichat.common.common.domain.vo.request.IdReqVO;
 import com.ershi.hichat.common.common.domain.vo.response.ApiResult;
 import com.ershi.hichat.common.common.utils.RequestHolder;
 import com.ershi.hichat.common.domain.vo.response.CursorPageBaseResp;
@@ -37,6 +39,20 @@ public class ContactController {
     public ApiResult<CursorPageBaseResp<ChatContactResp>> getRoomPage(@Valid ChatContactPageReq chatContactPageReq) {
         Long uid = RequestHolder.get().getUid();
         return ApiResult.success(roomContactService.getContactPage(chatContactPageReq, uid));
+    }
+
+    @GetMapping("/public/contact/detail")
+    @ApiOperation("会话详情")
+    public ApiResult<ChatContactResp> getContactDetail(@Valid IdReqVO request) {
+        Long uid = RequestHolder.get().getUid();
+        return ApiResult.success(roomContactService.getContactDetail(uid, request.getId()));
+    }
+
+    @GetMapping("/public/contact/detail/friend")
+    @ApiOperation("会话详情(联系人列表发消息用)")
+    public ApiResult<ChatContactResp> getContactDetailByFriend(@Valid ContactFriendReq request) {
+        Long uid = RequestHolder.get().getUid();
+        return ApiResult.success(roomContactService.getContactDetailByFriend(uid, request.getUid()));
     }
 }
 

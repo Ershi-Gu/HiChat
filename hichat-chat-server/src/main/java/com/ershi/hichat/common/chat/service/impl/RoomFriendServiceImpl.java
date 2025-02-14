@@ -13,11 +13,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
 /**
  * 单聊房间服务
+ *
  * @author Ershi
  * @date 2024/12/30
  */
@@ -32,6 +35,7 @@ public class RoomFriendServiceImpl implements RoomFriendService {
 
     /**
      * 创建一个单聊房间
+     *
      * @param uidList
      * @return {@link RoomFriend}
      */
@@ -69,8 +73,22 @@ public class RoomFriendServiceImpl implements RoomFriendService {
     }
 
     /**
+     * 获取和好友的房间详情
+     *
+     * @param uid
+     * @param friendUid
+     * @return {@link RoomFriend }
+     */
+    @Override
+    public RoomFriend getFriendRoom(Long uid, Long friendUid) {
+        String roomKey = RoomAdapter.generateRoomKey(Arrays.asList(uid, friendUid));
+        return roomFriendDao.getByKey(roomKey);
+    }
+
+    /**
      * 创建单聊房间
-     * @param roomId 房间id
+     *
+     * @param roomId  房间id
      * @param uidList
      * @return {@link RoomFriend}
      */
@@ -82,6 +100,7 @@ public class RoomFriendServiceImpl implements RoomFriendService {
 
     /**
      * 还原单聊房间为正常状态，用于以前删除过好友重新启动
+     *
      * @param room
      */
     private void restoreRoomFriendIfNeed(RoomFriend roomFriend) {

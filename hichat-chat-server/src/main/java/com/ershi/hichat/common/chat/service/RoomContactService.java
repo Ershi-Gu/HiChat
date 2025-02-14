@@ -6,6 +6,7 @@ import com.ershi.hichat.common.chat.domain.vo.response.contact.ChatContactResp;
 import com.ershi.hichat.common.domain.vo.response.CursorPageBaseResp;
 
 import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 
 /**
  * 用户会话房间服务支持类
@@ -15,4 +16,8 @@ import javax.validation.Valid;
 public interface RoomContactService {
 
     CursorPageBaseResp<ChatContactResp> getContactPage(@Valid ChatContactPageReq chatContactPageReq, Long uid);
+
+    ChatContactResp getContactDetail(Long uid, @NotNull long roomId);
+
+    ChatContactResp getContactDetailByFriend(Long uid, @NotNull Long friendUid);
 }

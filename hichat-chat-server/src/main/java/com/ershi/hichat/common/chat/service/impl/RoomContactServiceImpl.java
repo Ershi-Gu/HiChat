@@ -12,11 +12,13 @@ import com.ershi.hichat.common.chat.domain.enums.RoomTypeEnum;
 import com.ershi.hichat.common.chat.domain.vo.request.contact.ChatContactPageReq;
 import com.ershi.hichat.common.chat.domain.vo.response.contact.ChatContactResp;
 import com.ershi.hichat.common.chat.service.RoomContactService;
+import com.ershi.hichat.common.chat.service.RoomFriendService;
 import com.ershi.hichat.common.chat.service.adapter.RoomContactAdapter;
 import com.ershi.hichat.common.chat.service.cache.HotRoomCache;
 import com.ershi.hichat.common.chat.service.cache.RoomCache;
 import com.ershi.hichat.common.chat.service.cache.RoomFriendCache;
 import com.ershi.hichat.common.chat.service.cache.RoomGroupCache;
+import com.ershi.hichat.common.common.utils.AssertUtil;
 import com.ershi.hichat.common.domain.vo.response.CursorPageBaseResp;
 import com.ershi.hichat.common.user.domain.entity.User;
 import com.ershi.hichat.common.user.service.cache.UserInfoCache;
@@ -50,6 +52,30 @@ public class RoomContactServiceImpl implements RoomContactService {
 
     @Autowired
     private MessageDao messageDao;
+
+    @Autowired
+    private RoomFriendService roomFriendService;
+
+    /**
+     * 获取会话房间详细信息
+     *
+     * @param uid
+     * @param roomId
+     * @return {@link ChatContactResp }
+     */
+    @Override
+    public ChatContactResp getContactDetail(Long uid, long roomId) {
+        Room room = roomCache.get(roomId);
+        AssertUtil.isNotEmpty(room, "房间不存在");
+        return buildContactResp(uid, Collections.singletonList(roomId)).get(0);
+    }
+
+    @Override
+    public ChatContactResp getContactDetailByFriend(Long uid, Long friendUid) {
+        RoomFriend friendRoom = roomFriendService.getFriendRoom(uid, friendUid);
+        AssertUtil.isNotEmpty(friendRoom, "不是您的好友");
+        return buildContactResp(uid, Collections.singletonList(friendRoom.getRoomId())).get(0);
+    }
 
     /**
      * 聚合获取用户会话列表详情
@@ -201,6 +227,7 @@ public class RoomContactServiceImpl implements RoomContactService {
 
     /**
      * 获取单聊房间基本信息
+     *
      * @param friendRoomIds
      * @param uid
      * @return {@link Map }<{@link Long }, {@link User }> roomId-FriendUserInfo

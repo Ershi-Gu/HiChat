@@ -19,4 +19,6 @@ public interface RoomFriendService {
     }
 
     void disableFriendRoom(List<Long> uidList);
+
+    RoomFriend getFriendRoom(Long uid, Long friendUid);
 }
