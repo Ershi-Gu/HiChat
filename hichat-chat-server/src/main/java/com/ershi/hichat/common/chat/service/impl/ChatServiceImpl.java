@@ -196,7 +196,8 @@ public class ChatServiceImpl implements  ChatService {
         AssertUtil.isNotEmpty(receiveUid, "请先登录");
         // 从成员收件箱里面获取该房间该成员读取到的最后一条消息
         Contact contact = contactDao.get(room.getId(), receiveUid);
-        return contact.getReadMsgId();
+        AssertUtil.isNotEmpty(contact, "会话数据查询为空");
+        return contact.getLastMsgId();
     }
 
     /**

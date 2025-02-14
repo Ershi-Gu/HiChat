@@ -44,6 +44,11 @@ public class RedisKey {
     public static final String OFFLINE_UID_ZET = "offlineUser";
 
     /**
+     * 热门房间列表
+     */
+    public static final String HOT_ROOM_ZET = "hotRoom";
+
+    /**
      * 房间信息
      */
     public static final String ROOM_INFO_STRING = "roomInfo:roomId_%d";
@@ -54,9 +59,10 @@ public class RedisKey {
     public static final String ROOM_GROUP_INFO_STRING = "roomGroupInfo:roomId_%d";
 
     /**
-     * 热门房间列表
+     *单聊房间信息
      */
-    public static final String HOT_ROOM_ZET = "hotRoom:";
+    public static final String GROUP_FRIEND_STRING = "groupFriend:roomId_%d";
+
 
     /**
      * 获取key

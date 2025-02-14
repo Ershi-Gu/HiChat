@@ -16,19 +16,19 @@ import java.util.Date;
  * </p>
  *
  * @author <a href="https://github.com/Ershi-Gu">Ershi</a>
- * @since 2025-01-13
+ * @since 2025-02-13
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
 @TableName("contact")
 public class Contact implements Serializable {
 
-    private static final long serialVersionUID = 286839647750518589L;
+    private static final long serialVersionUID = 1L;
 
     /**
      * id
      */
-    @TableId(value = "id", type = IdType.ASSIGN_ID)
+    @TableId(value = "id", type = IdType.AUTO)
     private Long id;
 
     /**
@@ -44,10 +44,22 @@ public class Contact implements Serializable {
     private Long roomId;
 
     /**
-     * 阅读到的最后一条消息id
+     * 阅读到的时间
      */
-    @TableField("read_msg_id")
-    private Long readMsgId;
+    @TableField("read_time")
+    private Date readTime;
+
+    /**
+     * 会话内消息最后更新的时间(只有普通会话需要维护，全员会话不需要维护)
+     */
+    @TableField("active_time")
+    private Date activeTime;
+
+    /**
+     * 会话最新消息id
+     */
+    @TableField("last_msg_id")
+    private Long lastMsgId;
 
     /**
      * 创建时间

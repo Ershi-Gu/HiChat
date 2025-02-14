@@ -54,4 +54,9 @@ public class SystemMsgHandler extends AbstractMsgHandler<TextMsgDTO> {
         return replyMessage.getExtra().getTextMsgDTO().getContent();
     }
 
+    @Override
+    public String showMsgOnContact(Message message) {
+        return message.getExtra().getTextMsgDTO().getContent();
+    }
+
 }

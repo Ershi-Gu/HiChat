@@ -79,6 +79,14 @@ public abstract class AbstractMsgHandler <Req>{
      */
     public abstract Object showReplyMsg(Message replyMessage);
 
+    /**
+     * 消息展示在会话列表上的形式
+     * @param message
+     * @return {@link String }
+     */
+    public abstract String showMsgOnContact(Message message);
+
+
 
     /**
      * 检查消息合法性，并持久化消息到服务器

@@ -6,6 +6,8 @@ import com.ershi.hichat.common.chat.mapper.RoomFriendMapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 /**
  * <p>
  * 单聊房间表 服务实现类
@@ -59,5 +61,16 @@ public class RoomFriendDao extends ServiceImpl<RoomFriendMapper, RoomFriend> {
                 .eq(RoomFriend::getRoomKey, key)
                 .set(RoomFriend::getStatus, RoomStatusEnum.BAN)
                 .update();
+    }
+
+    /**
+     * 获取好友房间信息
+     * @param roomIds
+     * @return {@link List }<{@link RoomFriend }>
+     */
+    public List<RoomFriend> listByRoomIds(List<Long> roomIds) {
+        return lambdaQuery()
+                .in(RoomFriend::getRoomId, roomIds)
+                .list();
     }
 }

@@ -1,5 +1,6 @@
 package com.ershi.hichat.common.chat.service.strategy.msg.handler.type;
 
+import com.ershi.hichat.common.chat.constant.MsgOnContactContent;
 import com.ershi.hichat.common.chat.constant.MsgReplyContent;
 import com.ershi.hichat.common.chat.dao.MessageDao;
 import com.ershi.hichat.common.chat.domain.entity.Message;
@@ -68,5 +69,10 @@ public class FileMsgHandler extends AbstractMsgHandler<FileMsgDTO> {
     @Override
     public Object showReplyMsg(Message replyMessage) {
         return MsgReplyContent.FILE_REPLY_CONTENT;
+    }
+
+    @Override
+    public String showMsgOnContact(Message message) {
+        return MsgOnContactContent.FILE_CONTACT_CONTENT;
     }
 }

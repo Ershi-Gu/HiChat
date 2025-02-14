@@ -1,6 +1,7 @@
 package com.ershi.hichat.common.chat.consumer;
 
 
+import com.ershi.hichat.common.chat.dao.ContactDao;
 import com.ershi.hichat.common.chat.dao.MessageDao;
 import com.ershi.hichat.common.chat.dao.RoomDao;
 import com.ershi.hichat.common.chat.dao.RoomFriendDao;
@@ -60,6 +61,9 @@ public class MsgSendConsumer implements RocketMQListener<MsgSendMessageDTO> {
     @Autowired
     private PushService pushService;
 
+    @Autowired
+    private ContactDao contactDao;
+
     @Override
     public void onMessage(MsgSendMessageDTO dto) {
         Message message = messageDao.getById(dto.getMsgId());
@@ -88,8 +92,8 @@ public class MsgSendConsumer implements RocketMQListener<MsgSendMessageDTO> {
                 RoomFriend roomFriend = roomFriendDao.getByRoomId(room.getId());
                 memberUidList = Arrays.asList(roomFriend.getUid1(), roomFriend.getUid2());
             }
-            // todo 更新所有群成员收件箱的最新会话时间
-//            contactDao.refreshOrCreateActiveTime(room.getId(), memberUidList, message.getId(), message.getCreateTime());
+            // 更新所有群成员收件箱的最新会话时间
+            contactDao.refreshOrCreateActiveTime(room.getId(), memberUidList, message.getId(), message.getCreateTime());
             // 推送房间成员
             pushService.sendPushMsg(WSMsgAdapter.buildMsgSend(msgResp), memberUidList);
         }

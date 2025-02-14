@@ -9,6 +9,7 @@ import com.ershi.hichat.common.domain.vo.response.CursorPageBaseResp;
 import com.ershi.hichat.common.utils.CursorUtils;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
 import java.util.Objects;
 
 /**
@@ -51,6 +52,19 @@ public class MessageDao extends ServiceImpl<MessageMapper, Message> {
                 .eq(Message::getRoomId, roomId)
                 .gt(Message::getId, replyMsgId)
                 .le(Message::getId, msgId)
+                .count();
+    }
+
+    /**
+     * 通过用户阅读到的最后消息时间查询未读数
+     * @param roomId
+     * @param readTime
+     * @return {@link Integer }
+     */
+    public Integer getUnReadCount(Long roomId, Date readTime) {
+        return lambdaQuery()
+                .eq(Message::getRoomId, roomId)
+                .gt(Objects.nonNull(readTime), Message::getCreateTime, readTime)
                 .count();
     }
 }

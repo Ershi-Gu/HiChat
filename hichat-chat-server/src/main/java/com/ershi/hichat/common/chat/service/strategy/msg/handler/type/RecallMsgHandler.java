@@ -1,5 +1,6 @@
 package com.ershi.hichat.common.chat.service.strategy.msg.handler.type;
 
+import com.ershi.hichat.common.chat.constant.MsgOnContactContent;
 import com.ershi.hichat.common.chat.constant.MsgReplyContent;
 import com.ershi.hichat.common.chat.dao.MessageDao;
 import com.ershi.hichat.common.chat.domain.entity.Message;
@@ -63,6 +64,10 @@ public class RecallMsgHandler extends AbstractMsgHandler<TextMsgDTO> {
         return MsgReplyContent.RECALL_REPLY_CONTENT;
     }
 
+    @Override
+    public String showMsgOnContact(Message message) {
+        return MsgOnContactContent.RECALL_CONTACT_CONTENT;
+    }
 
     /**
      * 撤回消息
